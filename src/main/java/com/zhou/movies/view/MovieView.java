@@ -68,7 +68,7 @@ public class MovieView extends JFrame {
         });
     }
 
-    public void initPanel(){
+    private void initPanel(){
         // --- Initialize the input panel ---
         inputPanel = new JPanel(new FlowLayout());
 
