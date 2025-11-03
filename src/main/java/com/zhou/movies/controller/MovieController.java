@@ -15,13 +15,13 @@ public class MovieController {
         this.movieService = movieService;
     }
 
-    public void addMovieRequest(String title, String director, String yearStr,
+    public boolean addMovieRequest(String title, String director, String yearStr,
                                 Category category, Status status, Integer rating) {
 
         // 1. Checking fields
         if (title.isEmpty() || director.isEmpty() || yearStr.isEmpty()) {
             System.out.println("Error： Title, Director or Year ==> Cannot be empty!");
-            return;
+            return false;
         }
 
         // 2. Try to insert a Movie object
@@ -31,9 +31,12 @@ public class MovieController {
             Movie movie = new Movie(title, director, year, category, status, rating);
 
             movieService.addMovie(movie);
+            return true;
         } catch (NumberFormatException e) {
             System.out.println("Conversion Failed: Year ==> Should be a number!");
         }
+
+        return false;
     }
 
     public List<Movie> getAllMovies(){
