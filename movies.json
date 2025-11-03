@@ -30,5 +30,21 @@
     "rating": 1,
     "category": "HORROR",
     "status": "WATCHING"
+  },
+  {
+    "title": "sdf",
+    "director": "cxz",
+    "year": 234,
+    "rating": 1,
+    "category": "ACTION",
+    "status": "WANT_TO_WATCH"
+  },
+  {
+    "title": "czxcv",
+    "director": "adf",
+    "year": 123,
+    "rating": 3,
+    "category": "DRAMA",
+    "status": "WATCHING"
   }
 ]
