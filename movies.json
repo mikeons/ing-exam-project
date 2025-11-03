@@ -1,0 +1,34 @@
+[
+  {
+    "title": "nezha2",
+    "director": "jiaozi",
+    "year": 2025,
+    "rating": 4,
+    "category": "COMEDY",
+    "status": "WATCHED"
+  },
+  {
+    "title": "breaking bad",
+    "director": "walter white",
+    "year": 2008,
+    "rating": 4,
+    "category": "ACTION",
+    "status": "WATCHING"
+  },
+  {
+    "title": "bb theory",
+    "director": "command",
+    "year": 2333,
+    "rating": 2,
+    "category": "HORROR",
+    "status": "WATCHING"
+  },
+  {
+    "title": "overseas",
+    "director": "template",
+    "year": 9992,
+    "rating": 1,
+    "category": "HORROR",
+    "status": "WATCHING"
+  }
+]

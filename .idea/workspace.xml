@@ -4,10 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="bfd9ea6a-9a71-47bc-ae59-407b85c61f5b" name="Changes" comment="bug resolve">
+    <list default="true" id="bfd9ea6a-9a71-47bc-ae59-407b85c61f5b" name="Changes" comment="Refactoring MovieView with Abstraction">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/zhou/movies/controller/MovieController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/zhou/movies/controller/MovieController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/zhou/movies/view/MovieView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/zhou/movies/view/MovieView.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/zhou/movies/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/zhou/movies/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/zhou/movies/service/impl/MovieServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/zhou/movies/service/impl/MovieServiceImpl.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -122,7 +123,15 @@
       <option name="project" value="LOCAL" />
       <updated>1762117300813</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Refactoring MovieView with Abstraction">
+      <option name="closed" value="true" />
+      <created>1762164873445</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1762164873445</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -175,6 +184,7 @@
     <MESSAGE value="Minimum runnable version of the movie collection management demo" />
     <MESSAGE value="Minimum runnable demo" />
     <MESSAGE value="bug resolve" />
-    <option name="LAST_COMMIT_MESSAGE" value="bug resolve" />
+    <MESSAGE value="Refactoring MovieView with Abstraction" />
+    <option name="LAST_COMMIT_MESSAGE" value="Refactoring MovieView with Abstraction" />
   </component>
 </project>

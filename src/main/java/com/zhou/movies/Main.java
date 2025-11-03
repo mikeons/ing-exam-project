@@ -1,18 +1,21 @@
 package com.zhou.movies;
 
 import com.zhou.movies.controller.MovieController;
+import com.zhou.movies.repository.MovieRepository;
+import com.zhou.movies.repository.impl.MovieRepositoryJsonImpl;
 import com.zhou.movies.service.impl.MovieServiceImpl;
 import com.zhou.movies.view.MovieView;
 
 import javax.swing.*;
 
 public class Main {
-
+    private static final String JSON_FILE_PATH = "movies.json"; // 统一定义路径
     public static void main(String[] args) {
 
         SwingUtilities.invokeLater(() -> {
             // 1. Create all concrete components
-            MovieServiceImpl serviceImpl = new MovieServiceImpl();
+            MovieRepository movieRepository = new MovieRepositoryJsonImpl(JSON_FILE_PATH);
+            MovieServiceImpl serviceImpl = new MovieServiceImpl(movieRepository);
             MovieView view = new MovieView();
             MovieController controller = new MovieController(serviceImpl);
 
