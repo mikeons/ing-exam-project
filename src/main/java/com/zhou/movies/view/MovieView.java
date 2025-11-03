@@ -4,13 +4,14 @@ import com.zhou.movies.controller.MovieController;
 import com.zhou.movies.pojo.Category;
 import com.zhou.movies.pojo.Movie;
 import com.zhou.movies.pojo.Status;
+import com.zhou.movies.service.Observer;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
 
-public class MovieView extends JFrame {
+public class MovieView extends JFrame implements Observer {
 
     private MovieController controller;
 
@@ -124,5 +125,12 @@ public class MovieView extends JFrame {
         categoryJComboBox.setSelectedIndex(0);
         statusComboBox.setSelectedIndex(0);
         ratingComboBox.setSelectedIndex(0);
+    }
+
+    @Override
+    public void update() {
+        List<Movie> updatedMovies = controller.getAllMovies();
+        refreshTable(updatedMovies);
+        clearInputFields();
     }
 }

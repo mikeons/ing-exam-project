@@ -4,18 +4,15 @@ import com.zhou.movies.pojo.Category;
 import com.zhou.movies.pojo.Movie;
 import com.zhou.movies.pojo.Status;
 import com.zhou.movies.service.MovieService;
-import com.zhou.movies.view.MovieView;
 
 import java.util.List;
 
 public class MovieController {
 
     private final MovieService movieService;
-    private final MovieView movieView;
 
-    public MovieController(MovieService movieService, MovieView movieView) {
+    public MovieController(MovieService movieService) {
         this.movieService = movieService;
-        this.movieView = movieView;
     }
 
     public void addMovieRequest(String title, String director, String yearStr,
@@ -34,19 +31,12 @@ public class MovieController {
             Movie movie = new Movie(title, director, year, category, status, rating);
 
             movieService.addMovie(movie);
-
-            movieView.refreshTable(movieService.getAllMovies());
-
-            movieView.clearInputFields();
         } catch (NumberFormatException e) {
             System.out.println("Conversion Failed: Year ==> Should be a number!");
         }
     }
 
-    // --- Getting data from the service and fill the MovieView ---
-    public void loadInitialData() {
-        List<Movie> movies = movieService.getAllMovies();
-
-        movieView.refreshTable(movies);
+    public List<Movie> getAllMovies(){
+        return movieService.getAllMovies();
     }
 }
