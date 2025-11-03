@@ -10,13 +10,36 @@ public class Movie {
     private Category category;
     private Status status;
 
-    public Movie(String title, String director, int year, Category category, Status status, int rating) {
-        this.title = title;
-        this.director = director;
-        this.year = year;
-        this.rating = rating;
-        this.category = category;
-        this.status = status;
+    public Movie(Builder builder) {
+        this.title = builder.title;
+        this.director = builder.director;
+        this.year = builder.year;
+        this.category = builder.category;
+        this.status = builder.status;
+        this.rating = builder.rating;
+    }
+
+    public static class Builder{
+        private String title;
+        private String director;
+        private int year;
+        private int rating;
+        private Category category;
+        private Status status;
+
+        public Builder(String title, String director){
+            this.title = title;
+            this.director = director;
+        }
+
+        public Builder year(int year) { this.year = year; return this; }
+        public Builder category(Category c) { this.category = c; return this; }
+        public Builder status(Status s) { this.status = s; return this; }
+        public Builder rating(int r) { this.rating = r; return this; }
+
+        public Movie build() {
+            return new Movie(this);
+        }
     }
 
     public int getRating() {
