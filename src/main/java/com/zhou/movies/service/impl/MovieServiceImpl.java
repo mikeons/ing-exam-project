@@ -18,10 +18,12 @@ public class MovieServiceImpl implements MovieService, Subject {
         observers = new ArrayList<>();
     }
 
+    @Override
     public List<Movie> getAllMovies(){
         return movieRepository.findAll();
     }
 
+    @Override
     public void addMovie(Movie movie){
         movieRepository.save(movie);
         notifyObservers();
