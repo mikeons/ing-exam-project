@@ -1,50 +1,186 @@
 [
   {
-    "title": "nezha2",
-    "director": "jiaozi",
-    "year": 2025,
+    "title": "The Matrix",
+    "director": "The Wachowskis",
+    "year": 1999,
+    "rating": 5,
+    "category": "SCI_FI",
+    "status": "WATCHED"
+  },
+  {
+    "title": "Avatar",
+    "director": "James Cameron",
+    "year": 2009,
+    "rating": 4,
+    "category": "SCI_FI",
+    "status": "WANT_TO_WATCH"
+  },
+  {
+    "title": "The Godfather",
+    "director": "Francis Ford Coppola",
+    "year": 1972,
+    "rating": 5,
+    "category": "DRAMA",
+    "status": "WATCHED"
+  },
+  {
+    "title": "Pulp Fiction",
+    "director": "Quentin Tarantino",
+    "year": 1994,
+    "rating": 5,
+    "category": "DRAMA",
+    "status": "WATCHED"
+  },
+  {
+    "title": "The Avengers",
+    "director": "Joss Whedon",
+    "year": 2012,
+    "rating": 4,
+    "category": "ACTION",
+    "status": "WATCHING"
+  },
+  {
+    "title": "Toy Story",
+    "director": "John Lasseter",
+    "year": 1995,
+    "rating": 4,
+    "category": "OTHER",
+    "status": "WATCHED"
+  },
+  {
+    "title": "The Notebook",
+    "director": "Nick Cassavetes",
+    "year": 2004,
+    "rating": 3,
+    "category": "ROMANCE",
+    "status": "WANT_TO_WATCH"
+  },
+  {
+    "title": "Coco",
+    "director": "Lee Unkrich",
+    "year": 2017,
+    "rating": 5,
+    "category": "OTHER",
+    "status": "WATCHED"
+  },
+  {
+    "title": "Get Out",
+    "director": "Jordan Peele",
+    "year": 2017,
+    "rating": 4,
+    "category": "HORROR",
+    "status": "WATCHED"
+  },
+  {
+    "title": "Joker",
+    "director": "Todd Phillips",
+    "year": 2019,
+    "rating": 5,
+    "category": "DRAMA",
+    "status": "WATCHING"
+  },
+  {
+    "title": "Whiplash",
+    "director": "Damien Chazelle",
+    "year": 2014,
+    "rating": 5,
+    "category": "DRAMA",
+    "status": "WATCHED"
+  },
+  {
+    "title": "Kung Fu Panda",
+    "director": "Mark Osborne",
+    "year": 2008,
     "rating": 4,
     "category": "COMEDY",
     "status": "WATCHED"
   },
   {
-    "title": "breaking bad",
-    "director": "walter white",
-    "year": 2008,
+    "title": "Train to Busan",
+    "director": "Yeon Sang-ho",
+    "year": 2016,
+    "rating": 4,
+    "category": "HORROR",
+    "status": "WANT_TO_WATCH"
+  },
+  {
+    "title": "Mission Impossible",
+    "director": "Brian De Palma",
+    "year": 1996,
     "rating": 4,
     "category": "ACTION",
     "status": "WATCHING"
   },
   {
-    "title": "bb theory",
-    "director": "command",
-    "year": 2333,
-    "rating": 2,
-    "category": "HORROR",
-    "status": "WATCHING"
+    "title": "The Social Network",
+    "director": "David Fincher",
+    "year": 2010,
+    "rating": 5,
+    "category": "DRAMA",
+    "status": "WATCHED"
   },
   {
-    "title": "overseas",
-    "director": "template",
-    "year": 9992,
-    "rating": 1,
-    "category": "HORROR",
-    "status": "WATCHING"
+    "title": "Inception",
+    "director": "Christopher Nolan",
+    "year": 2010,
+    "rating": 5,
+    "category": "SCI_FI",
+    "status": "WATCHED"
   },
   {
-    "title": "sdf",
-    "director": "cxz",
-    "year": 234,
-    "rating": 1,
+    "title": "The Dark Knight",
+    "director": "Christopher Nolan",
+    "year": 2008,
+    "rating": 5,
     "category": "ACTION",
+    "status": "WATCHED"
+  },
+  {
+    "title": "La La Land",
+    "director": "Damien Chazelle",
+    "year": 2016,
+    "rating": 4,
+    "category": "ROMANCE",
+    "status": "WATCHING"
+  },
+  {
+    "title": "Parasite",
+    "director": "Bong Joon-ho",
+    "year": 2019,
+    "rating": 5,
+    "category": "DRAMA",
+    "status": "WATCHED"
+  },
+  {
+    "title": "Interstellar",
+    "director": "Christopher Nolan",
+    "year": 2014,
+    "rating": 5,
+    "category": "SCI_FI",
     "status": "WANT_TO_WATCH"
   },
   {
-    "title": "czxcv",
-    "director": "adf",
-    "year": 123,
-    "rating": 3,
-    "category": "DRAMA",
+    "title": "Spirited Away",
+    "director": "Hayao Miyazaki",
+    "year": 2001,
+    "rating": 5,
+    "category": "OTHER",
+    "status": "WATCHED"
+  },
+  {
+    "title": "The Conjuring",
+    "director": "James Wan",
+    "year": 2013,
+    "rating": 4,
+    "category": "HORROR",
     "status": "WATCHING"
+  },
+  {
+    "title": "Free Solo",
+    "director": "Jimmy Chin",
+    "year": 2018,
+    "rating": 5,
+    "category": "DOCUMENTARY",
+    "status": "WANT_TO_WATCH"
   }
 ]

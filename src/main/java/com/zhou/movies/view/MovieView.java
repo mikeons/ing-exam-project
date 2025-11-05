@@ -4,6 +4,8 @@ import com.zhou.movies.controller.MovieController;
 import com.zhou.movies.dto.MovieDTO;
 import com.zhou.movies.pojo.Movie;
 import com.zhou.movies.service.Observer;
+import com.zhou.movies.service.strategy.SortDirection;
+import com.zhou.movies.service.strategy.SortStrategyType;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -17,6 +19,7 @@ public class MovieView extends JFrame implements Observer {
     private DefaultTableModel tableModel;
 
     private MovieInputPanel inputPanel;
+    private ToolbarPanel toolbarPanel;
 
     public MovieView() {
         setTitle("My movies collection");
@@ -37,11 +40,13 @@ public class MovieView extends JFrame implements Observer {
         tableModel = new DefaultTableModel(columnNames, 0);
         movieTable = new JTable(tableModel);
 
-        // --- Initialize Sub Input Panel ---
+        // --- Initialize Sub Panels ---
         inputPanel = new MovieInputPanel();
+        toolbarPanel = new ToolbarPanel();
 
         // --- Initialize Layout ---
         setLayout(new BorderLayout());
+        add(toolbarPanel, BorderLayout.NORTH);
         add(new JScrollPane(movieTable), BorderLayout.CENTER);
         add(inputPanel, BorderLayout.SOUTH);
 
@@ -65,6 +70,29 @@ public class MovieView extends JFrame implements Observer {
                     inputPanel.clearFields();
                 } else {
                     JOptionPane.showMessageDialog(this, "Insertion Failed: Pls check the input data!", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+
+        toolbarPanel.getSortComboBox().addActionListener(e -> {
+            if (controller != null) {
+                SortStrategyType selectedStrategy = (SortStrategyType) toolbarPanel.getSortComboBox().getSelectedItem();
+
+                controller.changeSortStrategy(selectedStrategy);
+            }
+        });
+
+        toolbarPanel.getSortDirectionButton().addActionListener(e -> {
+            if (controller != null) {
+                JToggleButton button = toolbarPanel.getSortDirectionButton();
+
+                // Is Ascending by default
+                if (button.isSelected()) {
+                    button.setText("Descending ⬇\uFE0F");
+                    controller.changeSortDirection(SortDirection.DESCENDING);
+                } else {
+                    button.setText("Ascending ⬆\uFE0F");
+                    controller.changeSortDirection(SortDirection.ASCENDING);
                 }
             }
         });

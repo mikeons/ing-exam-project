@@ -3,6 +3,8 @@ package com.zhou.movies.controller;
 import com.zhou.movies.dto.MovieDTO;
 import com.zhou.movies.pojo.Movie;
 import com.zhou.movies.service.MovieService;
+import com.zhou.movies.service.strategy.SortDirection;
+import com.zhou.movies.service.strategy.SortStrategyType;
 
 import java.util.List;
 
@@ -42,5 +44,13 @@ public class MovieController {
 
     public List<Movie> getAllMovies(){
         return movieService.getAllMovies();
+    }
+
+    public void changeSortStrategy(SortStrategyType strategyType){
+        movieService.setSortStrategy(strategyType);
+    }
+
+    public void changeSortDirection(SortDirection direction){
+        movieService.setSortDirection(direction);
     }
 }

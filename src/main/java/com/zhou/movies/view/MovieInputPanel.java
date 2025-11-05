@@ -4,8 +4,13 @@ import javax.swing.*;
 
 import com.zhou.movies.pojo.Category;
 import com.zhou.movies.pojo.Status;
+
 import java.awt.*;
 
+/**
+ * A dedicated panel for "Add Movie" inputs.
+ * Its Single Responsibility is to gather data for creating a new movie.
+ */
 public class MovieInputPanel extends JPanel {
     private final JTextField titleField = new JTextField(20);
     private final JTextField directorField = new JTextField(20);
