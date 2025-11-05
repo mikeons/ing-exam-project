@@ -2,7 +2,9 @@ package com.zhou.movies.view;
 
 import com.zhou.movies.controller.MovieController;
 import com.zhou.movies.dto.MovieDTO;
+import com.zhou.movies.pojo.Category;
 import com.zhou.movies.pojo.Movie;
+import com.zhou.movies.pojo.Status;
 import com.zhou.movies.service.Observer;
 import com.zhou.movies.service.strategy.SortDirection;
 import com.zhou.movies.service.strategy.SortStrategyType;
@@ -50,6 +52,11 @@ public class MovieView extends JFrame implements Observer {
         add(new JScrollPane(movieTable), BorderLayout.CENTER);
         add(inputPanel, BorderLayout.SOUTH);
 
+        // --- Linking Listeners to buttons ---
+        initListeners();
+    }
+
+    private void initListeners(){
         inputPanel.getAddButton().addActionListener(e -> {
             if (controller != null) {
 
@@ -88,14 +95,50 @@ public class MovieView extends JFrame implements Observer {
 
                 // Is Ascending by default
                 if (button.isSelected()) {
-                    button.setText("Descending ⬇\uFE0F");
+                    button.setText("Descending ⬇️");
                     controller.changeSortDirection(SortDirection.DESCENDING);
                 } else {
-                    button.setText("Ascending ⬆\uFE0F");
+                    button.setText("Ascending ⬆️");
                     controller.changeSortDirection(SortDirection.ASCENDING);
                 }
             }
         });
+
+        // 1. Category filter
+        toolbarPanel.getCategoryFilterComboBox().addActionListener(e -> {
+            if (controller != null) {
+                // We use null as "All", so we can convert directly
+                Category selected = (Category) toolbarPanel.getCategoryFilterComboBox().getSelectedItem();
+                controller.setFilterCategory(selected);
+            }
+        });
+
+        // 2. Status filter
+        toolbarPanel.getStatusFilterComboBox().addActionListener(e -> {
+            if (controller != null) {
+                Status selected = (Status) toolbarPanel.getStatusFilterComboBox().getSelectedItem();
+                controller.setFilterStatus(selected);
+            }
+        });
+
+        // 3. Rating filter
+        toolbarPanel.getRatingFilterComboBox().addActionListener(e -> {
+            if (controller != null) {
+                Integer selected = (Integer) toolbarPanel.getRatingFilterComboBox().getSelectedItem();
+                controller.setFilterRating(selected);
+            }
+        });
+
+        // 4. Reset all fields of sorting and filters
+        toolbarPanel.getResetButton().addActionListener(e -> {
+            if (controller != null) {
+                controller.resetFiltersAndSort();
+
+                toolbarPanel.resetFilterControls();
+                toolbarPanel.resetSortControls();
+            }
+        });
+
     }
 
     public void refreshTable(List<Movie> movies) {

@@ -1,6 +1,8 @@
 package com.zhou.movies.service.impl;
 
+import com.zhou.movies.pojo.Category;
 import com.zhou.movies.pojo.Movie;
+import com.zhou.movies.pojo.Status;
 import com.zhou.movies.service.strategy.SortDirection;
 import com.zhou.movies.service.strategy.SortStrategyType;
 import com.zhou.movies.repository.MovieRepository;
@@ -14,6 +16,7 @@ import com.zhou.movies.service.strategy.impl.SortByYearStrategy;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class MovieServiceImpl implements MovieService, Subject {
     private final MovieRepository movieRepository;
@@ -22,6 +25,10 @@ public class MovieServiceImpl implements MovieService, Subject {
     private final List<Movie> moviesListCache;
     private SortingStrategy currentSortingStrategy;
     private SortDirection currentSortDirection;
+
+    private Category currentFilterCategory = null;
+    private Status currentFilterStatus = null;
+    private Integer currentFilterRating = null;
 
     public MovieServiceImpl(MovieRepository movieRepository){
         this.movieRepository = movieRepository;
@@ -35,13 +42,17 @@ public class MovieServiceImpl implements MovieService, Subject {
 
     @Override
     public List<Movie> getAllMovies(){
-        List<Movie> listToDisplay = new ArrayList<>(this.moviesListCache);
+        List<Movie> filteredMovies = moviesListCache.stream()
+                .filter(movie -> (currentFilterCategory == null || movie.getCategory().equals(currentFilterCategory)))
+                .filter(movie -> (currentFilterStatus == null || movie.getStatus().equals(currentFilterStatus)))
+                .filter(movie -> (currentFilterRating == null || movie.getRating() == currentFilterRating))
+                .collect(Collectors.toList());
 
         if (currentSortingStrategy != null) {
-            currentSortingStrategy.sort(listToDisplay, currentSortDirection);
+            currentSortingStrategy.sort(filteredMovies, currentSortDirection);
         }
 
-        return listToDisplay;
+        return filteredMovies;
     }
 
     @Override
@@ -91,6 +102,36 @@ public class MovieServiceImpl implements MovieService, Subject {
     @Override
     public void setSortDirection(SortDirection sortDirection){
         currentSortDirection = sortDirection;
+        notifyObservers();
+    }
+
+    @Override
+    public void setFilterCategory(Category category) {
+        this.currentFilterCategory = category;
+        notifyObservers();
+    }
+
+    @Override
+    public void setFilterStatus(Status status) {
+        this.currentFilterStatus = status;
+        notifyObservers();
+    }
+
+    @Override
+    public void setFilterRating(Integer rating) {
+        this.currentFilterRating = rating;
+        notifyObservers();
+    }
+
+    @Override
+    public void resetFiltersAndSort() {
+        this.currentFilterCategory = null;
+        this.currentFilterStatus = null;
+        this.currentFilterRating = null;
+
+        this.currentSortingStrategy = new SortByTitleStrategy();
+        this.currentSortDirection = SortDirection.ASCENDING;
+
         notifyObservers();
     }
 }

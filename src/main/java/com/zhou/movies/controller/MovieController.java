@@ -1,7 +1,9 @@
 package com.zhou.movies.controller;
 
 import com.zhou.movies.dto.MovieDTO;
+import com.zhou.movies.pojo.Category;
 import com.zhou.movies.pojo.Movie;
+import com.zhou.movies.pojo.Status;
 import com.zhou.movies.service.MovieService;
 import com.zhou.movies.service.strategy.SortDirection;
 import com.zhou.movies.service.strategy.SortStrategyType;
@@ -52,5 +54,21 @@ public class MovieController {
 
     public void changeSortDirection(SortDirection direction){
         movieService.setSortDirection(direction);
+    }
+
+    public void setFilterCategory(Category category) {
+        movieService.setFilterCategory(category);
+    }
+
+    public void setFilterStatus(Status status) {
+        movieService.setFilterStatus(status);
+    }
+
+    public void setFilterRating(Integer rating) {
+        movieService.setFilterRating(rating);
+    }
+
+    public void resetFiltersAndSort() {
+        movieService.resetFiltersAndSort();
     }
 }
