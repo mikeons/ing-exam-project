@@ -1,6 +1,7 @@
 package com.zhou.movies.view;
 
 import com.zhou.movies.controller.MovieController;
+import com.zhou.movies.dto.MovieDTO;
 import com.zhou.movies.pojo.Movie;
 import com.zhou.movies.service.Observer;
 
@@ -46,7 +47,9 @@ public class MovieView extends JFrame implements Observer {
 
         inputPanel.getAddButton().addActionListener(e -> {
             if (controller != null) {
-                boolean success = controller.addMovieRequest(
+
+                //1. View creates a DTO
+                MovieDTO movieDTO = new MovieDTO(
                         inputPanel.getTitleText(),
                         inputPanel.getDirectorText(),
                         inputPanel.getYearText(),
@@ -54,6 +57,9 @@ public class MovieView extends JFrame implements Observer {
                         inputPanel.getSelectedStatus(),
                         inputPanel.getSelectedRating()
                 );
+
+                //2. Passing only ONE parameter to controller!!!
+                boolean success = controller.addMovieRequest(movieDTO);
 
                 if (success) {
                     inputPanel.clearFields();
