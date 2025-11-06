@@ -1,5 +1,6 @@
 package com.zhou.movies.service.impl;
 
+import com.zhou.movies.dto.MovieDTO;
 import com.zhou.movies.pojo.Category;
 import com.zhou.movies.pojo.Movie;
 import com.zhou.movies.pojo.Status;
@@ -56,10 +57,61 @@ public class MovieServiceImpl implements MovieService, Subject {
     }
 
     @Override
-    public void addMovie(Movie movie){
-        movieRepository.save(movie);
-        moviesListCache.add(movie);
+    public void deleteMovie(String id) {
+        // Remove the movie from cache using its unique ID
+        moviesListCache.removeIf(movie -> movie.getId().equals(id));
 
+        // Update the JSON file (by overwriting with the new cache)
+        movieRepository.saveAll(moviesListCache);
+
+        // Notify all observers (View) to refresh
+        notifyObservers();
+    }
+
+    @Override
+    public void addMovie(MovieDTO dto) throws Exception {
+        int year = Integer.parseInt(dto.yearStr);
+
+        // Build a new domain object (Movie)
+        Movie movie = new Movie.Builder(dto.title, dto.director)
+                .year(year)
+                .category(dto.category)
+                .status(dto.status)
+                .rating(dto.rating)
+                .build();
+
+        // Save to cache and persist changes
+        moviesListCache.add(movie);
+        movieRepository.saveAll(moviesListCache);
+
+        // Notify observers to refresh the view
+        notifyObservers();
+    }
+
+    @Override
+    public void editMovie(String id, MovieDTO dto) throws Exception {
+        // Find the original movie by ID or throw if not found
+        Movie originalMovie = moviesListCache.stream()
+                .filter(m -> m.getId().equals(id))
+                .findFirst()
+                .orElseThrow(() -> new Exception("Movie not found with id: " + id));
+
+        int year = Integer.parseInt(dto.yearStr);
+
+        // Create an updated Movie object
+        Movie updatedMovie = originalMovie.toBuilder()
+                .title(dto.title)
+                .director(dto.director)
+                .year(year)
+                .category(dto.category)
+                .status(dto.status)
+                .rating(dto.rating)
+                .build();
+
+        // Replace in cache, persist, and notify observers
+        int index = moviesListCache.indexOf(originalMovie);
+        moviesListCache.set(index, updatedMovie);
+        movieRepository.saveAll(moviesListCache);
         notifyObservers();
     }
 

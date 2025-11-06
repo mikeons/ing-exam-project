@@ -19,33 +19,44 @@ public class MovieController {
     }
 
     public boolean addMovieRequest(MovieDTO dto) {
-        // 1. Checking fields
-        if (dto.title.isEmpty() || dto.director.isEmpty() || dto.yearStr.isEmpty()) {
-            System.out.println("Error： Title, Director or Year ==> Cannot be empty!");
+        try {
+            validateFields(dto);
+            movieService.addMovie(dto);
+            return true;
+        } catch (Exception e) {
+            System.out.println("Add Movie Failed: " + e.getMessage());
             return false;
         }
+    }
 
-        // 2. Try to insert a Movie object
+    public boolean editMovieRequest(String id, MovieDTO dto) {
         try {
-            int year = Integer.parseInt(dto.yearStr);
-
-            Movie movie = new Movie.Builder(dto.title, dto.director)
-                    .year(year)
-                    .category(dto.category)
-                    .status(dto.status)
-                    .rating(dto.rating)
-                    .build();
-
-            movieService.addMovie(movie);
+            validateFields(dto);
+            movieService.editMovie(id, dto);
             return true;
-        } catch (NumberFormatException e) {
-            System.out.println("Conversion Failed: Year ==> Should be a number!");
+        } catch (Exception e) {
+            System.out.println("Update Failed: " + e.getMessage());
             return false;
+        }
+    }
+
+    private void validateFields(MovieDTO dto) throws Exception {
+        if (dto.title.isEmpty() || dto.director.isEmpty() || dto.yearStr.isEmpty())
+            throw new Exception("Title, Director or Year cannot be empty!");
+
+        try {
+            Integer.parseInt(dto.yearStr);
+        } catch (NumberFormatException e) {
+            throw new Exception("Year must be a valid number!");
         }
     }
 
     public List<Movie> getAllMovies(){
         return movieService.getAllMovies();
+    }
+
+    public void deleteMovie(String id) {
+        movieService.deleteMovie(id);
     }
 
     public void changeSortStrategy(SortStrategyType strategyType){
@@ -71,4 +82,5 @@ public class MovieController {
     public void resetFiltersAndSort() {
         movieService.resetFiltersAndSort();
     }
+
 }

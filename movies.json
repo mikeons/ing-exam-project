@@ -1,5 +1,6 @@
 [
   {
+    "id": "87463719-39c0-4504-9fac-26560432fe8d",
     "title": "The Matrix",
     "director": "The Wachowskis",
     "year": 1999,
@@ -8,6 +9,7 @@
     "status": "WATCHED"
   },
   {
+    "id": "f34d66eb-d6e2-4f4a-a18c-41d9d7c292d5",
     "title": "Avatar",
     "director": "James Cameron",
     "year": 2009,
@@ -16,6 +18,7 @@
     "status": "WANT_TO_WATCH"
   },
   {
+    "id": "d612bf30-d11b-4eb4-a3e1-03b570aee517",
     "title": "The Godfather",
     "director": "Francis Ford Coppola",
     "year": 1972,
@@ -24,14 +27,16 @@
     "status": "WATCHED"
   },
   {
+    "id": "c5ef1e77-dd7b-4255-95bf-f26e61de253a",
     "title": "Pulp Fiction",
     "director": "Quentin Tarantino",
-    "year": 1994,
-    "rating": 5,
+    "year": 2005,
+    "rating": 1,
     "category": "DRAMA",
-    "status": "WATCHED"
+    "status": "WANT_TO_WATCH"
   },
   {
+    "id": "fcb5b233-8e15-4814-a0a7-5b26162c8f6a",
     "title": "The Avengers",
     "director": "Joss Whedon",
     "year": 2012,
@@ -40,14 +45,16 @@
     "status": "WATCHING"
   },
   {
+    "id": "0dba3b47-a012-4393-a7f5-94878889e87c",
     "title": "Toy Story",
     "director": "John Lasseter",
-    "year": 1995,
+    "year": 2032,
     "rating": 4,
     "category": "OTHER",
     "status": "WATCHED"
   },
   {
+    "id": "9fe3e6fe-c8dc-4e10-af92-7b464f7df00b",
     "title": "The Notebook",
     "director": "Nick Cassavetes",
     "year": 2004,
@@ -56,22 +63,16 @@
     "status": "WANT_TO_WATCH"
   },
   {
-    "title": "Coco",
-    "director": "Lee Unkrich",
-    "year": 2017,
-    "rating": 5,
-    "category": "OTHER",
-    "status": "WATCHED"
+    "id": "039f34df-fb6b-4067-b748-007a57126363",
+    "title": "Coco Loveasdfasdf",
+    "director": "Lee sdfxczv",
+    "year": 2332,
+    "rating": 3,
+    "category": "ROMANCE",
+    "status": "WANT_TO_WATCH"
   },
   {
-    "title": "Get Out",
-    "director": "Jordan Peele",
-    "year": 2017,
-    "rating": 4,
-    "category": "HORROR",
-    "status": "WATCHED"
-  },
-  {
+    "id": "931f495b-f453-42e1-aef2-81ff59d6215f",
     "title": "Joker",
     "director": "Todd Phillips",
     "year": 2019,
@@ -80,46 +81,7 @@
     "status": "WATCHING"
   },
   {
-    "title": "Whiplash",
-    "director": "Damien Chazelle",
-    "year": 2014,
-    "rating": 5,
-    "category": "DRAMA",
-    "status": "WATCHED"
-  },
-  {
-    "title": "Kung Fu Panda",
-    "director": "Mark Osborne",
-    "year": 2008,
-    "rating": 4,
-    "category": "COMEDY",
-    "status": "WATCHED"
-  },
-  {
-    "title": "Train to Busan",
-    "director": "Yeon Sang-ho",
-    "year": 2016,
-    "rating": 4,
-    "category": "HORROR",
-    "status": "WANT_TO_WATCH"
-  },
-  {
-    "title": "Mission Impossible",
-    "director": "Brian De Palma",
-    "year": 1996,
-    "rating": 4,
-    "category": "ACTION",
-    "status": "WATCHING"
-  },
-  {
-    "title": "The Social Network",
-    "director": "David Fincher",
-    "year": 2010,
-    "rating": 5,
-    "category": "DRAMA",
-    "status": "WATCHED"
-  },
-  {
+    "id": "c7a34b9c-78a1-4a1e-96c0-bd8c316d7c09",
     "title": "Inception",
     "director": "Christopher Nolan",
     "year": 2010,
@@ -128,6 +90,25 @@
     "status": "WATCHED"
   },
   {
+    "id": "ab9e5746-51a3-4d2f-89e1-c915f367cf25",
+    "title": "Interstellar",
+    "director": "Christopher Nolan",
+    "year": 2014,
+    "rating": 5,
+    "category": "SCI_FI",
+    "status": "WATCHED"
+  },
+  {
+    "id": "8b7f2e5e-2990-4cf3-8ff7-9a45b713ef8a",
+    "title": "Titanic",
+    "director": "James Cameron",
+    "year": 1997,
+    "rating": 4,
+    "category": "ROMANCE",
+    "status": "WATCHED"
+  },
+  {
+    "id": "41cb91f4-bbfb-4c06-b232-b87b003e54e9",
     "title": "The Dark Knight",
     "director": "Christopher Nolan",
     "year": 2008,
@@ -136,14 +117,7 @@
     "status": "WATCHED"
   },
   {
-    "title": "La La Land",
-    "director": "Damien Chazelle",
-    "year": 2016,
-    "rating": 4,
-    "category": "ROMANCE",
-    "status": "WATCHING"
-  },
-  {
+    "id": "b0b8a3f5-2836-4420-8f09-53237a06e7cd",
     "title": "Parasite",
     "director": "Bong Joon-ho",
     "year": 2019,
@@ -152,35 +126,129 @@
     "status": "WATCHED"
   },
   {
-    "title": "Interstellar",
-    "director": "Christopher Nolan",
+    "id": "cf4cf6b2-1b5d-487d-b2a9-70b045b9a4f1",
+    "title": "Whiplash",
+    "director": "Damien Chazelle",
     "year": 2014,
     "rating": 5,
-    "category": "SCI_FI",
-    "status": "WANT_TO_WATCH"
+    "category": "DRAMA",
+    "status": "WATCHED"
   },
   {
-    "title": "Spirited Away",
-    "director": "Hayao Miyazaki",
-    "year": 2001,
+    "id": "e61a6f7b-9469-4a3a-8d7d-71a42fd6b6f4",
+    "title": "The Lion King",
+    "director": "Roger Allers",
+    "year": 1994,
     "rating": 5,
     "category": "OTHER",
     "status": "WATCHED"
   },
   {
+    "id": "6e5aef48-32dc-44b1-9f91-9f4af0f9457f",
+    "title": "La La Lands",
+    "director": "Damien Chazelle",
+    "year": 2013,
+    "rating": 5,
+    "category": "ROMANCE",
+    "status": "WATCHED"
+  },
+  {
+    "id": "9f308b52-2c94-4b2f-8979-73b06e5c7de5",
+    "title": "Fight Club",
+    "director": "David Fincher",
+    "year": 1999,
+    "rating": 5,
+    "category": "DRAMA",
+    "status": "WATCHED"
+  },
+  {
+    "id": "c2d3c3f4-35a3-49b1-8e86-1dbb5a46ac5d",
+    "title": "Forrest Gump",
+    "director": "Robert Zemeckis",
+    "year": 1994,
+    "rating": 5,
+    "category": "DRAMA",
+    "status": "WATCHED"
+  },
+  {
+    "id": "b889b7b2-70cf-41e7-a32a-1efb132c7b1b",
+    "title": "Frozen",
+    "director": "Chris Buck",
+    "year": 2013,
+    "rating": 4,
+    "category": "OTHER",
+    "status": "WATCHED"
+  },
+  {
+    "id": "cfbf31d3-54b0-4b9b-8e22-2895f6f857a1",
+    "title": "Oppenheimer",
+    "director": "Christopher Nolan",
+    "year": 2023,
+    "rating": 5,
+    "category": "DRAMA",
+    "status": "WANT_TO_WATCH"
+  },
+  {
+    "id": "58c991af-8c7c-4b5b-9a45-ec3e4eb79e20",
+    "title": "The Social Network",
+    "director": "David Fincher",
+    "year": 2010,
+    "rating": 4,
+    "category": "DRAMA",
+    "status": "WATCHED"
+  },
+  {
+    "id": "b9d3f8cd-b987-4145-8e36-4f43481a3b70",
     "title": "The Conjuring",
     "director": "James Wan",
     "year": 2013,
     "rating": 4,
     "category": "HORROR",
-    "status": "WATCHING"
+    "status": "WATCHED"
   },
   {
-    "title": "Free Solo",
-    "director": "Jimmy Chin",
-    "year": 2018,
+    "id": "b5cf8708-f03c-43c8-a7ce-96ddf3546883",
+    "title": "John Wick",
+    "director": "Chad Stahelski",
+    "year": 2014,
     "rating": 5,
-    "category": "DOCUMENTARY",
+    "category": "ACTION",
+    "status": "WATCHED"
+  },
+  {
+    "id": "6cb28efb-7d41-4b3e-9de0-1cb3f7a7b62a",
+    "title": "A Quiet Place",
+    "director": "John Krasinski",
+    "year": 2018,
+    "rating": 4,
+    "category": "HORROR",
+    "status": "WATCHED"
+  },
+  {
+    "id": "a5d9de36-5f36-4f8d-925e-8b932a671930",
+    "title": "Barbie",
+    "director": "Greta Gerwig",
+    "year": 2023,
+    "rating": 4,
+    "category": "OTHER",
     "status": "WANT_TO_WATCH"
+  },
+  {
+    "id": "05f4c7a2-2030-4a56-b9c5-2607a2b43013",
+    "title": "The Shawshank Redemption",
+    "director": "Frank Darabont",
+    "year": 1994,
+    "rating": 5,
+    "category": "DRAMA",
+    "status": "WATCHED"
+  },
+  {
+    "id": "da3ef0a4-88e8-4a77-8122-72ecb54d9a1f",
+    "title": "Guardians of the Galaxy",
+    "director": "James Gunn",
+    "year": 2014,
+    "rating": 4,
+    "category": "ACTION",
+    "status": "WATCHED"
   }
 ]

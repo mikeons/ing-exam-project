@@ -21,6 +21,9 @@ public class ToolbarPanel extends JToolBar {
     private final JComboBox<Status> statusFilterComboBox;
     private final JComboBox<Integer> ratingFilterComboBox;
     private final JButton resetButton;
+    private final JButton editButton;
+    private final JButton deleteButton;
+
 
     public ToolbarPanel() {
         add(new JLabel("Sort by:"));
@@ -53,12 +56,18 @@ public class ToolbarPanel extends JToolBar {
         resetButton = new JButton("Reset 🔄");
         add(resetButton);
 
+        // edite movie button
+        editButton = new JButton("Edit ✍️");
+        add(editButton);
+
+        // delete movie button
+        deleteButton = new JButton("Delete 🗑️");
+        add(deleteButton);
+
         addSeparator();
     }
 
-    /**
-     * Create ComboBox with "All" (null) option
-     */
+    //Create ComboBox with "All" (null) option
     private <T> JComboBox<T> createEnumComboBox(T[] items) {
         JComboBox<T> comboBox = new JComboBox<>();
         comboBox.addItem(null);
@@ -101,6 +110,14 @@ public class ToolbarPanel extends JToolBar {
 
     public JButton getResetButton() {
         return resetButton;
+    }
+
+    public JButton getEditButton(){
+        return editButton;
+    }
+
+    public JButton getDeleteButton() {
+        return deleteButton;
     }
 
     public void resetFilterControls() {

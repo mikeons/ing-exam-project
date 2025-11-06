@@ -78,19 +78,9 @@ public class MovieRepositoryJsonImpl implements MovieRepository {
     }
 
     @Override
-    public void save(Movie movie) {
-        // The "save" operation for a JSON file is a "Read-Modify-Write" cycle.
-
-        // 1. Read: Get the current list of all movies.
-        // (If findAll() fails and returns an empty list, we risk overwriting data)
-        List<Movie> movies = findAll();
-
-        // 2. Modify: Add the new movie to the list in memory.
-        movies.add(movie);
-
-        // 3. Write: Overwrite the *entire file* with the new, modified list.
+    public void saveAll(List<Movie> moviesListCache) {
         try (FileWriter writer = new FileWriter(filePath)) {
-            gson.toJson(movies, writer);
+            gson.toJson(moviesListCache, writer);
         } catch (IOException e) {
             e.printStackTrace();
         }
