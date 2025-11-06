@@ -24,6 +24,8 @@ public class ToolbarPanel extends JToolBar {
     private final JButton editButton;
     private final JButton deleteButton;
 
+    private final JTextField searchField;
+    private final JButton searchButton;
 
     public ToolbarPanel() {
         add(new JLabel("Sort by:"));
@@ -64,7 +66,14 @@ public class ToolbarPanel extends JToolBar {
         deleteButton = new JButton("Delete 🗑️");
         add(deleteButton);
 
-        addSeparator();
+        add(new JSeparator(SwingConstants.VERTICAL));
+
+        add(new JLabel(" Search: "));
+        searchField = new JTextField(15); // 设置搜索框的默认宽度
+        add(searchField);
+
+        searchButton = new JButton("Find");
+        add(searchButton);
     }
 
     //Create ComboBox with "All" (null) option
@@ -120,10 +129,23 @@ public class ToolbarPanel extends JToolBar {
         return deleteButton;
     }
 
+    public JButton getSearchButton() {
+        return searchButton;
+    }
+
+    public JTextField getSearchField() {
+        return searchField;
+    }
+
+    public String getSearchQuery() {
+        return searchField.getText();
+    }
+
     public void resetFilterControls() {
         categoryFilterComboBox.setSelectedItem(null);
         statusFilterComboBox.setSelectedItem(null);
         ratingFilterComboBox.setSelectedItem(null);
+        searchField.setText("");
     }
 
     public void resetSortControls() {

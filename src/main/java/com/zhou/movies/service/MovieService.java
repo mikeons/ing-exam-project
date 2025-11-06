@@ -23,4 +23,6 @@ public interface MovieService {
     void setFilterRating(Integer rating);
 
     void resetFiltersAndSort();
+
+    void setSearchQuery(String query);
 }

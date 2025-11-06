@@ -31,6 +31,8 @@ public class MovieServiceImpl implements MovieService, Subject {
     private Status currentFilterStatus = null;
     private Integer currentFilterRating = null;
 
+    private String currentSearchQuery = null;
+
     public MovieServiceImpl(MovieRepository movieRepository){
         this.movieRepository = movieRepository;
         this.observers = new ArrayList<>();
@@ -43,12 +45,28 @@ public class MovieServiceImpl implements MovieService, Subject {
 
     @Override
     public List<Movie> getAllMovies(){
-        List<Movie> filteredMovies = moviesListCache.stream()
+        // Apply search params if exist
+        List<Movie> searchResults;
+        if (currentSearchQuery == null) {
+            searchResults = new ArrayList<>(moviesListCache);
+        } else {
+            String queryLower = currentSearchQuery.toLowerCase();
+            searchResults = moviesListCache.stream()
+                    .filter(movie ->
+                            movie.getTitle().toLowerCase().contains(queryLower) ||
+                                    movie.getDirector().toLowerCase().contains(queryLower)
+                    )
+                    .collect(Collectors.toList());
+        }
+
+        // Filtering result of searched movies with selected categories
+        List<Movie> filteredMovies = searchResults.stream()
                 .filter(movie -> (currentFilterCategory == null || movie.getCategory().equals(currentFilterCategory)))
                 .filter(movie -> (currentFilterStatus == null || movie.getStatus().equals(currentFilterStatus)))
                 .filter(movie -> (currentFilterRating == null || movie.getRating() == currentFilterRating))
                 .collect(Collectors.toList());
 
+        // Sorting filtered Movies with the selected strategy
         if (currentSortingStrategy != null) {
             currentSortingStrategy.sort(filteredMovies, currentSortDirection);
         }
@@ -181,9 +199,17 @@ public class MovieServiceImpl implements MovieService, Subject {
         this.currentFilterStatus = null;
         this.currentFilterRating = null;
 
+        this.currentSearchQuery = null;
+
         this.currentSortingStrategy = new SortByTitleStrategy();
         this.currentSortDirection = SortDirection.ASCENDING;
 
         notifyObservers();
+    }
+
+    @Override
+    public void setSearchQuery(String query) {
+        this.currentSearchQuery = (query == null || query.trim().isEmpty()) ? null : query.trim();
+        notifyObservers(); // 通知 View 刷新
     }
 }

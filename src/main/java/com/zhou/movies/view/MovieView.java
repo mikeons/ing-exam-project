@@ -80,6 +80,23 @@ public class MovieView extends JFrame implements Observer {
         initFormListeners();
         initEditDeleteListeners();
         initSortAndFilterListeners();
+        initSearchListeners();
+    }
+
+    private void initSearchListeners() {
+        // Search Action
+        Runnable searchAction = () -> {
+            if (controller != null) {
+                String query = toolbarPanel.getSearchQuery();
+                controller.searchMovies(query);
+            }
+        };
+
+        // Search with button
+        toolbarPanel.getSearchButton().addActionListener(e -> searchAction.run());
+
+        // Search with Enter
+        toolbarPanel.getSearchField().addActionListener(e -> searchAction.run());
     }
 
     private void initFormListeners(){

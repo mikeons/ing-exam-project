@@ -83,4 +83,7 @@ public class MovieController {
         movieService.resetFiltersAndSort();
     }
 
+    public void searchMovies(String query) {
+        movieService.setSearchQuery(query);
+    }
 }
