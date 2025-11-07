@@ -4,6 +4,7 @@ import javax.swing.*;
 
 import com.zhou.movies.pojo.Category;
 import com.zhou.movies.pojo.Status;
+import com.zhou.movies.pojo.Movie;
 
 import java.awt.*;
 
@@ -19,7 +20,9 @@ public class MovieInputPanel extends JPanel {
     private final JComboBox<Category> categoryJComboBox;
     private final JComboBox<Status> statusComboBox;
     private final JComboBox<Integer> ratingComboBox;
-    private final JButton addButton = new JButton("ADD");
+
+    private final JButton submitButton = new JButton("ADD");
+    private final JButton cancelButton = new JButton("Cancel");
 
     public MovieInputPanel() {
         setLayout(new FlowLayout());
@@ -29,6 +32,7 @@ public class MovieInputPanel extends JPanel {
         categoryJComboBox = new JComboBox<>(Category.values());
         statusComboBox = new JComboBox<>(Status.values());
 
+        // Initialize movie form components
         add(new JLabel("Title:"));
         add(titleField);
         add(new JLabel("Director:"));
@@ -41,7 +45,10 @@ public class MovieInputPanel extends JPanel {
         add(statusComboBox);
         add(new JLabel("Rating:"));
         add(ratingComboBox);
-        add(addButton);
+
+        // Initialize form buttons
+        add(submitButton);
+        add(cancelButton);
     }
 
     public String getTitleText() { return titleField.getText(); }
@@ -51,7 +58,11 @@ public class MovieInputPanel extends JPanel {
     public Status getSelectedStatus() { return (Status) statusComboBox.getSelectedItem(); }
     public Integer getSelectedRating() { return (Integer) ratingComboBox.getSelectedItem(); }
 
-    public JButton getAddButton() { return addButton; }
+    public JButton getSubmitButton() { return submitButton; }
+
+    public JButton getCancelButton(){
+        return cancelButton;
+    }
 
     public void clearFields() {
         titleField.setText("");
@@ -60,5 +71,18 @@ public class MovieInputPanel extends JPanel {
         categoryJComboBox.setSelectedIndex(0);
         statusComboBox.setSelectedIndex(0);
         ratingComboBox.setSelectedIndex(0);
+    }
+
+    public void populateForm(Movie movie) {
+        titleField.setText(movie.getTitle());
+        directorField.setText(movie.getDirector());
+        yearField.setText(String.valueOf(movie.getYear()));
+        categoryJComboBox.setSelectedItem(movie.getCategory());
+        statusComboBox.setSelectedItem(movie.getStatus());
+        ratingComboBox.setSelectedItem(movie.getRating());
+    }
+
+    public void focusTitleField() {
+        titleField.requestFocusInWindow();
     }
 }

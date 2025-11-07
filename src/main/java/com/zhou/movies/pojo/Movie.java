@@ -1,16 +1,19 @@
 package com.zhou.movies.pojo;
 
 import java.util.Objects;
+import java.util.UUID;
 
 public class Movie {
-    private String title;
-    private String director;
-    private int year;
-    private int rating;
-    private Category category;
-    private Status status;
+    private final String id;
+    private final String title;
+    private final String director;
+    private final int year;
+    private final int rating;
+    private final Category category;
+    private final Status status;
 
     public Movie(Builder builder) {
+        this.id = builder.id;
         this.title = builder.title;
         this.director = builder.director;
         this.year = builder.year;
@@ -19,7 +22,12 @@ public class Movie {
         this.rating = builder.rating;
     }
 
+    public Builder toBuilder() {
+        return new Builder(this);
+    }
+
     public static class Builder{
+        private final String id;
         private String title;
         private String director;
         private int year;
@@ -28,8 +36,29 @@ public class Movie {
         private Status status;
 
         public Builder(String title, String director){
+            this.id = UUID.randomUUID().toString();
             this.title = title;
             this.director = director;
+        }
+
+        private Builder(Movie movie) {
+            this.id = movie.id;
+            this.title = movie.title;
+            this.director = movie.director;
+            this.year = movie.year;
+            this.category = movie.category;
+            this.status = movie.status;
+            this.rating = movie.rating;
+        }
+
+        public Builder title(String title){
+            this.title = title;
+            return this;
+        }
+
+        public Builder director(String director){
+            this.director = director;
+            return this;
         }
 
         public Builder year(int year) { this.year = year; return this; }
@@ -42,52 +71,32 @@ public class Movie {
         }
     }
 
-    public int getRating() {
-        return rating;
+    public String getId(){
+        return id;
     }
 
-    public void setRating(int rating) {
-        this.rating = rating;
+    public int getRating() {
+        return rating;
     }
 
     public String getTitle() {
         return title;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
     public String getDirector() {
         return director;
-    }
-
-    public void setDirector(String director) {
-        this.director = director;
     }
 
     public int getYear() {
         return year;
     }
 
-    public void setYear(int year) {
-        this.year = year;
-    }
-
     public Category getCategory() {
         return category;
     }
 
-    public void setCategory(Category category) {
-        this.category = category;
-    }
-
     public Status getStatus() {
         return status;
-    }
-
-    public void setStatus(Status status) {
-        this.status = status;
     }
 
     @Override
@@ -95,12 +104,12 @@ public class Movie {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Movie movie = (Movie) o;
-        return year == movie.year && rating == movie.rating && Objects.equals(title, movie.title) && Objects.equals(director, movie.director) && category == movie.category && status == movie.status;
+        return Objects.equals(id, movie.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(title, director, year, rating, category, status);
+        return Objects.hash(id);
     }
 
     @Override

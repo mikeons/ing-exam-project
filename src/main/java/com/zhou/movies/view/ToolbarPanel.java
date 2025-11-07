@@ -22,19 +22,29 @@ public class ToolbarPanel extends JToolBar {
     private final JComboBox<Integer> ratingFilterComboBox;
     private final JButton resetButton;
 
+    private final JTextField searchField;
+    private final JButton searchButton;
+
     public ToolbarPanel() {
-        add(new JLabel("Sort by:"));
+
+        // ---------------------------------
+        // Group 1: SORTING
+        // ---------------------------------
+        add(new JLabel(" Sort by: "));
         sortComboBox = new JComboBox<>(SortStrategyType.values());
         add(sortComboBox);
 
-        // sort direction toggle
         sortDirectionButton = new JToggleButton("Ascending ⬆️");
         sortDirectionButton.setSelected(false);
         add(sortDirectionButton);
 
+        // --- SEPARATOR ---
         addSeparator();
 
-        add(new JLabel("Filter by:"));
+        // ---------------------------------
+        // Group 2: FILTERING
+        // ---------------------------------
+        add(new JLabel(" Filter by: "));
 
         // category filter
         categoryFilterComboBox = createEnumComboBox(Category.values());
@@ -49,16 +59,32 @@ public class ToolbarPanel extends JToolBar {
         ratingFilterComboBox = createEnumComboBox(ratings);
         add(ratingFilterComboBox);
 
-        // reset all fields button
-        resetButton = new JButton("Reset 🔄");
+        // --- SEPARATOR ---
+        addSeparator();
+
+        // ---------------------------------
+        // Group 3: SEARCHING
+        // ---------------------------------
+        add(new JLabel(" Search: "));
+        searchField = new JTextField(12);
+        add(searchField);
+
+        searchButton = new JButton("Search \uD83D\uDD0D");
+        add(searchButton);
+
+        // --- SEPARATOR ---
+        addSeparator();
+
+        // ---------------------------------
+        // Group 4: GLOBAL ACTIONS
+        // ---------------------------------
+        resetButton = new JButton("Reset All 🔄");
+        resetButton.setPreferredSize(new Dimension(120, 28));
         add(resetButton);
 
-        addSeparator();
     }
 
-    /**
-     * Create ComboBox with "All" (null) option
-     */
+    //Create ComboBox with "All" (null) option
     private <T> JComboBox<T> createEnumComboBox(T[] items) {
         JComboBox<T> comboBox = new JComboBox<>();
         comboBox.addItem(null);
@@ -103,10 +129,23 @@ public class ToolbarPanel extends JToolBar {
         return resetButton;
     }
 
+    public JButton getSearchButton() {
+        return searchButton;
+    }
+
+    public JTextField getSearchField() {
+        return searchField;
+    }
+
+    public String getSearchQuery() {
+        return searchField.getText();
+    }
+
     public void resetFilterControls() {
         categoryFilterComboBox.setSelectedItem(null);
         statusFilterComboBox.setSelectedItem(null);
         ratingFilterComboBox.setSelectedItem(null);
+        searchField.setText("");
     }
 
     public void resetSortControls() {
