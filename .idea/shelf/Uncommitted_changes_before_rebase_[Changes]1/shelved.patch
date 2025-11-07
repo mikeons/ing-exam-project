@@ -1,0 +1,55 @@
+Index: src/main/java/com/zhou/movies/service/MovieService.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.zhou.movies.service;\r\n\r\nimport com.zhou.movies.dto.MovieDTO;\r\nimport com.zhou.movies.pojo.Category;\r\nimport com.zhou.movies.pojo.Movie;\r\nimport com.zhou.movies.pojo.Status;\r\nimport com.zhou.movies.service.strategy.SortDirection;\r\nimport com.zhou.movies.service.strategy.SortStrategyType;\r\n\r\nimport java.util.List;\r\n\r\npublic interface MovieService {\r\n    List<Movie> getAllMovies();\r\n    void addMovie(MovieDTO dto) throws Exception;\r\n    void editMovie(String id, MovieDTO dto) throws Exception;\r\n    void deleteMovie(String id);\r\n\r\n    void setSortStrategy(SortStrategyType strategyType);\r\n    void setSortDirection(SortDirection sortDirection);\r\n\r\n    void setFilterCategory(Category category);\r\n    void setFilterStatus(Status status);\r\n    void setFilterRating(Integer rating);\r\n\r\n    void resetFiltersAndSort();\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/zhou/movies/service/MovieService.java b/src/main/java/com/zhou/movies/service/MovieService.java
+--- a/src/main/java/com/zhou/movies/service/MovieService.java	
++++ b/src/main/java/com/zhou/movies/service/MovieService.java	
+@@ -10,6 +10,7 @@
+ import java.util.List;
+ 
+ public interface MovieService {
++
+     List<Movie> getAllMovies();
+     void addMovie(MovieDTO dto) throws Exception;
+     void editMovie(String id, MovieDTO dto) throws Exception;
+Index: src/main/java/com/zhou/movies/service/impl/MovieServiceImpl.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.zhou.movies.service.impl;\r\n\r\nimport com.zhou.movies.dto.MovieDTO;\r\nimport com.zhou.movies.pojo.Category;\r\nimport com.zhou.movies.pojo.Movie;\r\nimport com.zhou.movies.pojo.Status;\r\nimport com.zhou.movies.service.strategy.SortDirection;\r\nimport com.zhou.movies.service.strategy.SortStrategyType;\r\nimport com.zhou.movies.repository.MovieRepository;\r\nimport com.zhou.movies.service.MovieService;\r\nimport com.zhou.movies.service.Observer;\r\nimport com.zhou.movies.service.strategy.SortingStrategy;\r\nimport com.zhou.movies.service.Subject;\r\nimport com.zhou.movies.service.strategy.impl.SortByRatingStrategy;\r\nimport com.zhou.movies.service.strategy.impl.SortByTitleStrategy;\r\nimport com.zhou.movies.service.strategy.impl.SortByYearStrategy;\r\n\r\nimport java.util.ArrayList;\r\nimport java.util.List;\r\nimport java.util.stream.Collectors;\r\n\r\npublic class MovieServiceImpl implements MovieService, Subject {\r\n    private final MovieRepository movieRepository;\r\n    private final List<Observer> observers;\r\n\r\n    private final List<Movie> moviesListCache;\r\n    private SortingStrategy currentSortingStrategy;\r\n    private SortDirection currentSortDirection;\r\n\r\n    private Category currentFilterCategory = null;\r\n    private Status currentFilterStatus = null;\r\n    private Integer currentFilterRating = null;\r\n\r\n    public MovieServiceImpl(MovieRepository movieRepository){\r\n        this.movieRepository = movieRepository;\r\n        this.observers = new ArrayList<>();\r\n\r\n        this.moviesListCache = movieRepository.findAll();\r\n\r\n        this.currentSortingStrategy = new SortByTitleStrategy();\r\n        this.currentSortDirection = SortDirection.ASCENDING;\r\n    }\r\n\r\n    @Override\r\n    public List<Movie> getAllMovies(){\r\n        List<Movie> filteredMovies = moviesListCache.stream()\r\n                .filter(movie -> (currentFilterCategory == null || movie.getCategory().equals(currentFilterCategory)))\r\n                .filter(movie -> (currentFilterStatus == null || movie.getStatus().equals(currentFilterStatus)))\r\n                .filter(movie -> (currentFilterRating == null || movie.getRating() == currentFilterRating))\r\n                .collect(Collectors.toList());\r\n\r\n        if (currentSortingStrategy != null) {\r\n            currentSortingStrategy.sort(filteredMovies, currentSortDirection);\r\n        }\r\n\r\n        return filteredMovies;\r\n    }\r\n\r\n    @Override\r\n    public void deleteMovie(String id) {\r\n        // Remove the movie from cache using its unique ID\r\n        moviesListCache.removeIf(movie -> movie.getId().equals(id));\r\n\r\n        // Update the JSON file (by overwriting with the new cache)\r\n        movieRepository.saveAll(moviesListCache);\r\n\r\n        // Notify all observers (View) to refresh\r\n        notifyObservers();\r\n    }\r\n\r\n    @Override\r\n    public void addMovie(MovieDTO dto) throws Exception {\r\n        int year = Integer.parseInt(dto.yearStr);\r\n\r\n        // Build a new domain object (Movie)\r\n        Movie movie = new Movie.Builder(dto.title, dto.director)\r\n                .year(year)\r\n                .category(dto.category)\r\n                .status(dto.status)\r\n                .rating(dto.rating)\r\n                .build();\r\n\r\n        // Save to cache and persist changes\r\n        moviesListCache.add(movie);\r\n        movieRepository.saveAll(moviesListCache);\r\n\r\n        // Notify observers to refresh the view\r\n        notifyObservers();\r\n    }\r\n\r\n    @Override\r\n    public void editMovie(String id, MovieDTO dto) throws Exception {\r\n        // Find the original movie by ID or throw if not found\r\n        Movie originalMovie = moviesListCache.stream()\r\n                .filter(m -> m.getId().equals(id))\r\n                .findFirst()\r\n                .orElseThrow(() -> new Exception(\"Movie not found with id: \" + id));\r\n\r\n        int year = Integer.parseInt(dto.yearStr);\r\n\r\n        // Create an updated Movie object\r\n        Movie updatedMovie = originalMovie.toBuilder()\r\n                .title(dto.title)\r\n                .director(dto.director)\r\n                .year(year)\r\n                .category(dto.category)\r\n                .status(dto.status)\r\n                .rating(dto.rating)\r\n                .build();\r\n\r\n        // Replace in cache, persist, and notify observers\r\n        int index = moviesListCache.indexOf(originalMovie);\r\n        moviesListCache.set(index, updatedMovie);\r\n        movieRepository.saveAll(moviesListCache);\r\n        notifyObservers();\r\n    }\r\n\r\n    @Override\r\n    public void addObserver(Observer observer) {\r\n        observers.add(observer);\r\n    }\r\n\r\n    @Override\r\n    public void removeObserver(Observer observer) {\r\n        observers.remove(observer);\r\n    }\r\n\r\n    @Override\r\n    public void notifyObservers() {\r\n        for (Observer observer : observers)\r\n            observer.update();\r\n    }\r\n\r\n    @Override\r\n    public void setSortStrategy(SortStrategyType strategyType){\r\n        if (strategyType == null)\r\n            strategyType = SortStrategyType.TITLE;\r\n\r\n        switch (strategyType){\r\n            case YEAR:\r\n                currentSortingStrategy = new SortByYearStrategy();\r\n                break;\r\n            case RATING:\r\n                currentSortingStrategy = new SortByRatingStrategy();\r\n                break;\r\n            default:\r\n                currentSortingStrategy = new SortByTitleStrategy();\r\n                break;\r\n        }\r\n\r\n        notifyObservers();\r\n    }\r\n\r\n    @Override\r\n    public void setSortDirection(SortDirection sortDirection){\r\n        currentSortDirection = sortDirection;\r\n        notifyObservers();\r\n    }\r\n\r\n    @Override\r\n    public void setFilterCategory(Category category) {\r\n        this.currentFilterCategory = category;\r\n        notifyObservers();\r\n    }\r\n\r\n    @Override\r\n    public void setFilterStatus(Status status) {\r\n        this.currentFilterStatus = status;\r\n        notifyObservers();\r\n    }\r\n\r\n    @Override\r\n    public void setFilterRating(Integer rating) {\r\n        this.currentFilterRating = rating;\r\n        notifyObservers();\r\n    }\r\n\r\n    @Override\r\n    public void resetFiltersAndSort() {\r\n        this.currentFilterCategory = null;\r\n        this.currentFilterStatus = null;\r\n        this.currentFilterRating = null;\r\n\r\n        this.currentSortingStrategy = new SortByTitleStrategy();\r\n        this.currentSortDirection = SortDirection.ASCENDING;\r\n\r\n        notifyObservers();\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/zhou/movies/service/impl/MovieServiceImpl.java b/src/main/java/com/zhou/movies/service/impl/MovieServiceImpl.java
+--- a/src/main/java/com/zhou/movies/service/impl/MovieServiceImpl.java	
++++ b/src/main/java/com/zhou/movies/service/impl/MovieServiceImpl.java	
+@@ -41,7 +41,6 @@
+         this.currentSortDirection = SortDirection.ASCENDING;
+     }
+ 
+-    @Override
+     public List<Movie> getAllMovies(){
+         List<Movie> filteredMovies = moviesListCache.stream()
+                 .filter(movie -> (currentFilterCategory == null || movie.getCategory().equals(currentFilterCategory)))
+@@ -56,6 +55,7 @@
+         return filteredMovies;
+     }
+ 
++<<<<<<< HEAD
+     @Override
+     public void deleteMovie(String id) {
+         // Remove the movie from cache using its unique ID
+@@ -112,6 +112,10 @@
+         int index = moviesListCache.indexOf(originalMovie);
+         moviesListCache.set(index, updatedMovie);
+         movieRepository.saveAll(moviesListCache);
++=======
++    public void addMovie(Movie movie){
++        movieRepository.save(movie);
++>>>>>>> parent of 39f8bac (bug resolve)
+         notifyObservers();
+     }
+ 

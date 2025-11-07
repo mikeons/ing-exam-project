@@ -1,0 +1,1438 @@
+Index: src/main/java/com/zhou/movies/controller/MovieController.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.zhou.movies.controller;\r\n\r\nimport com.zhou.movies.dto.MovieDTO;\r\nimport com.zhou.movies.pojo.Movie;\r\nimport com.zhou.movies.service.MovieService;\r\n\r\nimport java.util.List;\r\n\r\npublic class MovieController {\r\n\r\n    private final MovieService movieService;\r\n\r\n    public MovieController(MovieService movieService) {\r\n        this.movieService = movieService;\r\n    }\r\n\r\n    public boolean addMovieRequest(MovieDTO dto) {\r\n        // 1. Checking fields\r\n        if (dto.title.isEmpty() || dto.director.isEmpty() || dto.yearStr.isEmpty()) {\r\n            System.out.println(\"Error： Title, Director or Year ==> Cannot be empty!\");\r\n            return false;\r\n        }\r\n\r\n        // 2. Try to insert a Movie object\r\n        try {\r\n            int year = Integer.parseInt(dto.yearStr);\r\n\r\n            Movie movie = new Movie.Builder(dto.title, dto.director)\r\n                    .year(year)\r\n                    .category(dto.category)\r\n                    .status(dto.status)\r\n                    .rating(dto.rating)\r\n                    .build();\r\n\r\n            movieService.addMovie(movie);\r\n            return true;\r\n        } catch (NumberFormatException e) {\r\n            System.out.println(\"Conversion Failed: Year ==> Should be a number!\");\r\n            return false;\r\n        }\r\n    }\r\n\r\n    public List<Movie> getAllMovies(){\r\n        return movieService.getAllMovies();\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/zhou/movies/controller/MovieController.java b/src/main/java/com/zhou/movies/controller/MovieController.java
+--- a/src/main/java/com/zhou/movies/controller/MovieController.java	(revision c76925cbf9439680a1691feb834db8fe65f3e9f0)
++++ b/src/main/java/com/zhou/movies/controller/MovieController.java	(date 1762528434639)
+@@ -1,8 +1,12 @@
+ package com.zhou.movies.controller;
+ 
+ import com.zhou.movies.dto.MovieDTO;
++import com.zhou.movies.pojo.Category;
+ import com.zhou.movies.pojo.Movie;
++import com.zhou.movies.pojo.Status;
+ import com.zhou.movies.service.MovieService;
++import com.zhou.movies.service.strategy.SortDirection;
++import com.zhou.movies.service.strategy.SortStrategyType;
+ 
+ import java.util.List;
+ 
+@@ -15,32 +19,71 @@
+     }
+ 
+     public boolean addMovieRequest(MovieDTO dto) {
+-        // 1. Checking fields
+-        if (dto.title.isEmpty() || dto.director.isEmpty() || dto.yearStr.isEmpty()) {
+-            System.out.println("Error： Title, Director or Year ==> Cannot be empty!");
++        try {
++            validateFields(dto);
++            movieService.addMovie(dto);
++            return true;
++        } catch (Exception e) {
++            System.out.println("Add Movie Failed: " + e.getMessage());
+             return false;
+         }
++    }
+ 
+-        // 2. Try to insert a Movie object
++    public boolean editMovieRequest(String id, MovieDTO dto) {
+         try {
+-            int year = Integer.parseInt(dto.yearStr);
+-
+-            Movie movie = new Movie.Builder(dto.title, dto.director)
+-                    .year(year)
+-                    .category(dto.category)
+-                    .status(dto.status)
+-                    .rating(dto.rating)
+-                    .build();
+-
+-            movieService.addMovie(movie);
++            validateFields(dto);
++            movieService.editMovie(id, dto);
+             return true;
++        } catch (Exception e) {
++            System.out.println("Update Failed: " + e.getMessage());
++            return false;
++        }
++    }
++
++    private void validateFields(MovieDTO dto) throws Exception {
++        if (dto.title.isEmpty() || dto.director.isEmpty() || dto.yearStr.isEmpty())
++            throw new Exception("Title, Director or Year cannot be empty!");
++
++        try {
++            Integer.parseInt(dto.yearStr);
+         } catch (NumberFormatException e) {
+-            System.out.println("Conversion Failed: Year ==> Should be a number!");
+-            return false;
++            throw new Exception("Year must be a valid number!");
+         }
+     }
+ 
+     public List<Movie> getAllMovies(){
+         return movieService.getAllMovies();
+     }
++
++    public void deleteMovie(String id) {
++        movieService.deleteMovie(id);
++    }
++
++    public void changeSortStrategy(SortStrategyType strategyType){
++        movieService.setSortStrategy(strategyType);
++    }
++
++    public void changeSortDirection(SortDirection direction){
++        movieService.setSortDirection(direction);
++    }
++
++    public void setFilterCategory(Category category) {
++        movieService.setFilterCategory(category);
++    }
++
++    public void setFilterStatus(Status status) {
++        movieService.setFilterStatus(status);
++    }
++
++    public void setFilterRating(Integer rating) {
++        movieService.setFilterRating(rating);
++    }
++
++    public void resetFiltersAndSort() {
++        movieService.resetFiltersAndSort();
++    }
++
++    public void searchMovies(String query) {
++        movieService.setSearchQuery(query);
++    }
+ }
+\ No newline at end of file
+Index: src/main/java/com/zhou/movies/view/MovieInputPanel.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.zhou.movies.view;\r\n\r\nimport javax.swing.*;\r\n\r\nimport com.zhou.movies.pojo.Category;\r\nimport com.zhou.movies.pojo.Status;\r\nimport java.awt.*;\r\n\r\npublic class MovieInputPanel extends JPanel {\r\n    private final JTextField titleField = new JTextField(20);\r\n    private final JTextField directorField = new JTextField(20);\r\n    private final JTextField yearField = new JTextField(5);\r\n\r\n    private final JComboBox<Category> categoryJComboBox;\r\n    private final JComboBox<Status> statusComboBox;\r\n    private final JComboBox<Integer> ratingComboBox;\r\n    private final JButton addButton = new JButton(\"ADD\");\r\n\r\n    public MovieInputPanel() {\r\n        setLayout(new FlowLayout());\r\n\r\n        Integer[] ratings = {1, 2, 3, 4, 5};\r\n        ratingComboBox = new JComboBox<>(ratings);\r\n        categoryJComboBox = new JComboBox<>(Category.values());\r\n        statusComboBox = new JComboBox<>(Status.values());\r\n\r\n        add(new JLabel(\"Title:\"));\r\n        add(titleField);\r\n        add(new JLabel(\"Director:\"));\r\n        add(directorField);\r\n        add(new JLabel(\"Year:\"));\r\n        add(yearField);\r\n        add(new JLabel(\"Category:\"));\r\n        add(categoryJComboBox);\r\n        add(new JLabel(\"Status:\"));\r\n        add(statusComboBox);\r\n        add(new JLabel(\"Rating:\"));\r\n        add(ratingComboBox);\r\n        add(addButton);\r\n    }\r\n\r\n    public String getTitleText() { return titleField.getText(); }\r\n    public String getDirectorText() { return directorField.getText(); }\r\n    public String getYearText() { return yearField.getText(); }\r\n    public Category getSelectedCategory() { return (Category) categoryJComboBox.getSelectedItem(); }\r\n    public Status getSelectedStatus() { return (Status) statusComboBox.getSelectedItem(); }\r\n    public Integer getSelectedRating() { return (Integer) ratingComboBox.getSelectedItem(); }\r\n\r\n    public JButton getAddButton() { return addButton; }\r\n\r\n    public void clearFields() {\r\n        titleField.setText(\"\");\r\n        directorField.setText(\"\");\r\n        yearField.setText(\"\");\r\n        categoryJComboBox.setSelectedIndex(0);\r\n        statusComboBox.setSelectedIndex(0);\r\n        ratingComboBox.setSelectedIndex(0);\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/zhou/movies/view/MovieInputPanel.java b/src/main/java/com/zhou/movies/view/MovieInputPanel.java
+--- a/src/main/java/com/zhou/movies/view/MovieInputPanel.java	(revision c76925cbf9439680a1691feb834db8fe65f3e9f0)
++++ b/src/main/java/com/zhou/movies/view/MovieInputPanel.java	(date 1762528417275)
+@@ -4,8 +4,14 @@
+ 
+ import com.zhou.movies.pojo.Category;
+ import com.zhou.movies.pojo.Status;
++import com.zhou.movies.pojo.Movie;
++
+ import java.awt.*;
+ 
++/**
++ * A dedicated panel for "Add Movie" inputs.
++ * Its Single Responsibility is to gather data for creating a new movie.
++ */
+ public class MovieInputPanel extends JPanel {
+     private final JTextField titleField = new JTextField(20);
+     private final JTextField directorField = new JTextField(20);
+@@ -14,7 +20,9 @@
+     private final JComboBox<Category> categoryJComboBox;
+     private final JComboBox<Status> statusComboBox;
+     private final JComboBox<Integer> ratingComboBox;
+-    private final JButton addButton = new JButton("ADD");
++
++    private final JButton submitButton = new JButton("ADD");
++    private final JButton cancelButton = new JButton("Cancel");
+ 
+     public MovieInputPanel() {
+         setLayout(new FlowLayout());
+@@ -24,6 +32,7 @@
+         categoryJComboBox = new JComboBox<>(Category.values());
+         statusComboBox = new JComboBox<>(Status.values());
+ 
++        // Initialize movie form components
+         add(new JLabel("Title:"));
+         add(titleField);
+         add(new JLabel("Director:"));
+@@ -36,7 +45,10 @@
+         add(statusComboBox);
+         add(new JLabel("Rating:"));
+         add(ratingComboBox);
+-        add(addButton);
++
++        // Initialize form buttons
++        add(submitButton);
++        add(cancelButton);
+     }
+ 
+     public String getTitleText() { return titleField.getText(); }
+@@ -46,7 +58,11 @@
+     public Status getSelectedStatus() { return (Status) statusComboBox.getSelectedItem(); }
+     public Integer getSelectedRating() { return (Integer) ratingComboBox.getSelectedItem(); }
+ 
+-    public JButton getAddButton() { return addButton; }
++    public JButton getSubmitButton() { return submitButton; }
++
++    public JButton getCancelButton(){
++        return cancelButton;
++    }
+ 
+     public void clearFields() {
+         titleField.setText("");
+@@ -56,4 +72,17 @@
+         statusComboBox.setSelectedIndex(0);
+         ratingComboBox.setSelectedIndex(0);
+     }
++
++    public void populateForm(Movie movie) {
++        titleField.setText(movie.getTitle());
++        directorField.setText(movie.getDirector());
++        yearField.setText(String.valueOf(movie.getYear()));
++        categoryJComboBox.setSelectedItem(movie.getCategory());
++        statusComboBox.setSelectedItem(movie.getStatus());
++        ratingComboBox.setSelectedItem(movie.getRating());
++    }
++
++    public void focusTitleField() {
++        titleField.requestFocusInWindow();
++    }
+ }
+\ No newline at end of file
+Index: movies.json
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>[\r\n  {\r\n    \"title\": \"nezha2\",\r\n    \"director\": \"jiaozi\",\r\n    \"year\": 2025,\r\n    \"rating\": 4,\r\n    \"category\": \"COMEDY\",\r\n    \"status\": \"WATCHED\"\r\n  },\r\n  {\r\n    \"title\": \"breaking bad\",\r\n    \"director\": \"walter white\",\r\n    \"year\": 2008,\r\n    \"rating\": 4,\r\n    \"category\": \"ACTION\",\r\n    \"status\": \"WATCHING\"\r\n  },\r\n  {\r\n    \"title\": \"bb theory\",\r\n    \"director\": \"command\",\r\n    \"year\": 2333,\r\n    \"rating\": 2,\r\n    \"category\": \"HORROR\",\r\n    \"status\": \"WATCHING\"\r\n  },\r\n  {\r\n    \"title\": \"overseas\",\r\n    \"director\": \"template\",\r\n    \"year\": 9992,\r\n    \"rating\": 1,\r\n    \"category\": \"HORROR\",\r\n    \"status\": \"WATCHING\"\r\n  },\r\n  {\r\n    \"title\": \"sdf\",\r\n    \"director\": \"cxz\",\r\n    \"year\": 234,\r\n    \"rating\": 1,\r\n    \"category\": \"ACTION\",\r\n    \"status\": \"WANT_TO_WATCH\"\r\n  },\r\n  {\r\n    \"title\": \"czxcv\",\r\n    \"director\": \"adf\",\r\n    \"year\": 123,\r\n    \"rating\": 3,\r\n    \"category\": \"DRAMA\",\r\n    \"status\": \"WATCHING\"\r\n  }\r\n]
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/movies.json b/movies.json
+--- a/movies.json	(revision c76925cbf9439680a1691feb834db8fe65f3e9f0)
++++ b/movies.json	(date 1762528435250)
+@@ -1,50 +1,434 @@
+ [
+   {
+-    "title": "nezha2",
+-    "director": "jiaozi",
+-    "year": 2025,
++    "id": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
++    "title": "Shadow of Tomorrow",
++    "director": "Michael Chen",
++    "year": 2019,
++    "rating": 4,
++    "category": "SCI_FI",
++    "status": "WATCHED"
++  },
++  {
++    "id": "b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e",
++    "title": "The Last Symphony",
++    "director": "Sarah Williams",
++    "year": 2015,
++    "rating": 5,
++    "category": "DRAMA",
++    "status": "WANT_TO_WATCH"
++  },
++  {
++    "id": "c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e7f",
++    "title": "Fteszxcv",
++    "director": "Roberto Masdf",
++    "year": 2021,
++    "rating": 3,
++    "category": "ROMANCE",
++    "status": "WATCHED"
++  },
++  {
++    "id": "d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f8a",
++    "title": "Steel Vengeance",
++    "director": "Jack Morrison",
++    "year": 2018,
++    "rating": 4,
++    "category": "ACTION",
++    "status": "WATCHING"
++  },
++  {
++    "id": "e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8a9b",
++    "title": "Whispers in the Dark",
++    "director": "Emily Thompson",
++    "year": 2020,
++    "rating": 4,
++    "category": "HORROR",
++    "status": "WATCHED"
++  },
++  {
++    "id": "f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c",
++    "title": "Beyond the Horizon",
++    "director": "David Park",
++    "year": 1998,
++    "rating": 5,
++    "category": "SCI_FI",
++    "status": "WATCHED"
++  },
++  {
++    "id": "a7b8c9d0-e1f2-4a3b-4c5d-6e7f8a9b0c1d",
++    "title": "asdfaf",
++    "director": "Thomasasdf",
++    "year": 2012,
++    "rating": 4,
++    "category": "ACTION",
++    "status": "WANT_TO_WATCH"
++  },
++  {
++    "id": "b8c9d0e1-f2a3-4b4c-5d6e-7f8a9b0c1d2e",
++    "title": "The Forgotten Garden",
++    "director": "Lisa Chang",
++    "year": 2007,
++    "rating": 3,
++    "category": "DRAMA",
++    "status": "WATCHED"
++  },
++  {
++    "id": "c9d0e1f2-a3b4-4c5d-6e7f-8a9b0c1d2e3f",
++    "title": "Midnight Confessions",
++    "director": "Anthony Rodriguez",
++    "year": 2016,
++    "rating": 2,
++    "category": "ROMANCE",
++    "status": "WATCHING"
++  },
++  {
++    "id": "d0e1f2a3-b4c5-4d6e-7f8a-9b0c1d2e3f4a",
++    "title": "Quantum Paradox",
++    "director": "Jennifer Lee",
++    "year": 2023,
++    "rating": 5,
++    "category": "SCI_FI",
++    "status": "WATCHED"
++  },
++  {
++    "id": "e1f2a3b4-c5d6-4e7f-8a9b-0c1d2e3f4a5b",
++    "title": "The Silent Scream",
++    "director": "Kevin Wright",
++    "year": 2014,
++    "rating": 4,
++    "category": "HORROR",
++    "status": "WANT_TO_WATCH"
++  },
++  {
++    "id": "f2a3b4c5-d6e7-4f8a-9b0c-1d2e3f4a5b6c",
++    "title": "Dancing with Shadows",
++    "director": "Maria Santos",
++    "year": 1995,
+     "rating": 4,
+-    "category": "COMEDY",
++    "category": "DRAMA",
++    "status": "WATCHED"
++  },
++  {
++    "id": "a3b4c5d6-e7f8-4a9b-0c1d-2e3f4a5b6c7d",
++    "title": "Neon Dreams",
++    "director": "Ryan Murphy",
++    "year": 2022,
++    "rating": 3,
++    "category": "SCI_FI",
++    "status": "WATCHING"
++  },
++  {
++    "id": "b4c5d6e7-f8a9-4b0c-1d2e-3f4a5b6c7d8e",
++    "title": "Iron Thunder",
++    "director": "Marcus Johnson",
++    "year": 2010,
++    "rating": 5,
++    "category": "ACTION",
+     "status": "WATCHED"
+   },
+   {
+-    "title": "breaking bad",
+-    "director": "walter white",
++    "id": "c5d6e7f8-a9b0-4c1d-2e3f-4a5b6c7d8e9f",
++    "title": "Summer Rain",
++    "director": "Sophie Miller",
+     "year": 2008,
++    "rating": 4,
++    "category": "ROMANCE",
++    "status": "WANT_TO_WATCH"
++  },
++  {
++    "id": "d6e7f8a9-b0c1-4d2e-3f4a-5b6c7d8e9f0a",
++    "title": "The Haunting Hour",
++    "director": "Daniel Foster",
++    "year": 2017,
++    "rating": 3,
++    "category": "HORROR",
++    "status": "WATCHED"
++  },
++  {
++    "id": "e7f8a9b0-c1d2-4e3f-4a5b-6c7d8e9f0a1b",
++    "title": "Chronicles of Destiny",
++    "director": "Amanda White",
++    "year": 2001,
++    "rating": 5,
++    "category": "OTHER",
++    "status": "WATCHING"
++  },
++  {
++    "id": "f8a9b0c1-d2e3-4f4a-5b6c-7d8e9f0a1b2c",
++    "title": "Broken Promises",
++    "director": "Christopher Hall",
++    "year": 2013,
++    "rating": 4,
++    "category": "DRAMA",
++    "status": "WATCHED"
++  },
++  {
++    "id": "a9b0c1d2-e3f4-4a5b-6c7d-8e9f0a1b2c3d",
++    "title": "Velocity Shock",
++    "director": "Brandon Taylor",
++    "year": 2024,
+     "rating": 4,
+     "category": "ACTION",
++    "status": "WANT_TO_WATCH"
++  },
++  {
++    "id": "b0c1d2e3-f4a5-4b6c-7d8e-9f0a1b2c3d4e",
++    "title": "Starlight Serenade",
++    "director": "Nicole Adams",
++    "year": 1989,
++    "rating": 5,
++    "category": "ROMANCE",
++    "status": "WATCHED"
++  },
++  {
++    "id": "c1d2e3f4-a5b6-4c7d-8e9f-0a1b2c3d4e5f",
++    "title": "The Void Within",
++    "director": "Samuel Brown",
++    "year": 2019,
++    "rating": 4,
++    "category": "SCI_FI",
+     "status": "WATCHING"
+   },
+   {
+-    "title": "bb theory",
+-    "director": "command",
+-    "year": 2333,
+-    "rating": 2,
++    "id": "d2e3f4a5-b6c7-4d8e-9f0a-1b2c3d4e5f6a",
++    "title": "Blood Moon Rising",
++    "director": "Victoria Green",
++    "year": 2011,
++    "rating": 3,
++    "category": "HORROR",
++    "status": "WATCHED"
++  },
++  {
++    "id": "e3f4a5b6-c7d8-4e9f-0a1b-2c3d4e5f6a7b",
++    "title": "Winter\u0027s End",
++    "director": "Patrick Wilson",
++    "year": 2005,
++    "rating": 4,
++    "category": "DRAMA",
++    "status": "WANT_TO_WATCH"
++  },
++  {
++    "id": "f4a5b6c7-d8e9-4f0a-1b2c-3d4e5f6a7b8c",
++    "title": "Phoenix Protocol",
++    "director": "Michelle Kim",
++    "year": 2021,
++    "rating": 5,
++    "category": "ACTION",
++    "status": "WATCHED"
++  },
++  {
++    "id": "a5b6c7d8-e9f0-4a1b-2c3d-4e5f6a7b8c9d",
++    "title": "Endless Summer",
++    "director": "James Carter",
++    "year": 1997,
++    "rating": 3,
++    "category": "ROMANCE",
++    "status": "WATCHING"
++  },
++  {
++    "id": "c7d8e9f0-a1b2-4c3d-4e5f-6a7b8c9d0e1f",
++    "title": "The Cursed Mansion",
++    "director": "Gregory Hunt",
++    "year": 2015,
++    "rating": 4,
+     "category": "HORROR",
++    "status": "WANT_TO_WATCH"
++  },
++  {
++    "id": "d8e9f0a1-b2c3-4d4e-5f6a-7b8c9d0e1f2a",
++    "title": "Fragments of Memory",
++    "director": "Laura Bennett",
++    "year": 2009,
++    "rating": 5,
++    "category": "DRAMA",
++    "status": "WATCHED"
++  },
++  {
++    "id": "e9f0a1b2-c3d4-4e5f-6a7b-8c9d0e1f2a3b",
++    "title": "Thunder Strike",
++    "director": "Eric Davis",
++    "year": 2018,
++    "rating": 4,
++    "category": "ACTION",
+     "status": "WATCHING"
+   },
+   {
+-    "title": "overseas",
+-    "director": "template",
+-    "year": 9992,
+-    "rating": 1,
++    "id": "f0a1b2c3-d4e5-4f6a-7b8c-9d0e1f2a3b4c",
++    "title": "Letters from Paris",
++    "director": "Claire Morgan",
++    "year": 2003,
++    "rating": 4,
++    "category": "ROMANCE",
++    "status": "WATCHED"
++  },
++  {
++    "id": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5e",
++    "title": "The Animator\u0027s Dream",
++    "director": "Steven Park",
++    "year": 2016,
++    "rating": 5,
++    "category": "OTHER",
++    "status": "WANT_TO_WATCH"
++  },
++  {
++    "id": "b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6f",
++    "title": "Digital Nightmare",
++    "director": "Henry Wallace",
++    "year": 2022,
++    "rating": 3,
+     "category": "HORROR",
++    "status": "WATCHED"
++  },
++  {
++    "id": "c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e7g",
++    "title": "City of Glass",
++    "director": "Olivia Chen",
++    "year": 2006,
++    "rating": 4,
++    "category": "DRAMA",
+     "status": "WATCHING"
+   },
+   {
+-    "title": "sdf",
+-    "director": "cxz",
+-    "year": 234,
+-    "rating": 1,
++    "id": "d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f8b",
++    "title": "Midnight Runners",
++    "director": "Carlos Rivera",
++    "year": 2014,
++    "rating": 5,
+     "category": "ACTION",
++    "status": "WATCHED"
++  },
++  {
++    "id": "e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8a9c",
++    "title": "Time Warp",
++    "director": "Peter Jackson",
++    "year": 1992,
++    "rating": 4,
++    "category": "SCI_FI",
+     "status": "WANT_TO_WATCH"
+   },
+   {
+-    "title": "czxcv",
+-    "director": "adf",
+-    "year": 123,
++    "id": "f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0d",
++    "title": "Autumn Leaves",
++    "director": "Grace Turner",
++    "year": 2011,
+     "rating": 3,
++    "category": "ROMANCE",
++    "status": "WATCHED"
++  },
++  {
++    "id": "a7b8c9d0-e1f2-4a3b-4c5d-6e7f8a9b0c1e",
++    "title": "The Lost Kingdom",
++    "director": "Nathan Cooper",
++    "year": 1985,
++    "rating": 5,
++    "category": "OTHER",
++    "status": "WATCHING"
++  },
++  {
++    "id": "b8c9d0e1-f2a3-4b4c-5d6e-7f8a9b0c1d2f",
++    "title": "Nightmare Avenue",
++    "director": "Jessica Moore",
++    "year": 2019,
++    "rating": 4,
++    "category": "HORROR",
++    "status": "WATCHED"
++  },
++  {
++    "id": "c9d0e1f2-a3b4-4c5d-6e7f-8a9b0c1d2e3g",
++    "title": "Shattered Dreams",
++    "director": "Richard King",
++    "year": 2004,
++    "rating": 4,
+     "category": "DRAMA",
++    "status": "WANT_TO_WATCH"
++  },
++  {
++    "id": "d0e1f2a3-b4c5-4d6e-7f8a-9b0c1d2e3f4b",
++    "title": "Fury Road Revisited",
++    "director": "Angela Phillips",
++    "year": 2023,
++    "rating": 5,
++    "category": "ACTION",
++    "status": "WATCHED"
++  },
++  {
++    "id": "e1f2a3b4-c5d6-4e7f-8a9b-0c1d2e3f4a5c",
++    "title": "Parallel Dimensions",
++    "director": "Frank Howard",
++    "year": 2017,
++    "rating": 4,
++    "category": "SCI_FI",
++    "status": "WATCHING"
++  },
++  {
++    "id": "f2a3b4c5-d6e7-4f8a-9b0c-1d2e3f4a5b6d",
++    "title": "Hearts in Bloom",
++    "director": "Sophia Martinez",
++    "year": 2000,
++    "rating": 3,
++    "category": "ROMANCE",
++    "status": "WATCHED"
++  },
++  {
++    "id": "a3b4c5d6-e7f8-4a9b-0c1d-2e3f4a5b6c7e",
++    "title": "The Phantom\u0027s Call",
++    "director": "Trevor Scott",
++    "year": 2012,
++    "rating": 4,
++    "category": "HORROR",
++    "status": "WANT_TO_WATCH"
++  },
++  {
++    "id": "c5d6e7f8-a9b0-4c1d-2e3f-4a5b6c7d8e9g",
++    "title": "Crystal Warriors",
++    "director": "Martin Lee",
++    "year": 2021,
++    "rating": 4,
++    "category": "OTHER",
++    "status": "WATCHING"
++  },
++  {
++    "id": "d6e7f8a9-b0c1-4d2e-3f4a-5b6c7d8e9f0b",
++    "title": "Galactic Frontier",
++    "director": "Rebecca Allen",
++    "year": 2025,
++    "rating": 5,
++    "category": "SCI_FI",
++    "status": "WATCHED"
++  },
++  {
++    "id": "e7f8a9b0-c1d2-4e3f-4a5b-6c7d8e9f0a1c",
++    "title": "Rogue Element",
++    "director": "Justin Walker",
++    "year": 2013,
++    "rating": 4,
++    "category": "ACTION",
++    "status": "WANT_TO_WATCH"
++  },
++  {
++    "id": "f8a9b0c1-d2e3-4f4a-5b6c-7d8e9f0a1b2d",
++    "title": "Love in December",
++    "director": "Hannah Roberts",
++    "year": 2007,
++    "rating": 3,
++    "category": "ROMANCE",
++    "status": "WATCHED"
++  },
++  {
++    "id": "a9b0c1d2-e3f4-4a5b-6c7d-8e9f0a1b2c3e",
++    "title": "The Dark Ritual",
++    "director": "Oscar Mitchell",
++    "year": 2018,
++    "rating": 4,
++    "category": "HORROR",
+     "status": "WATCHING"
++  },
++  {
++    "id": "b0c1d2e3-f4a5-4b6c-7d8e-9f0a1b2c3d4f",
++    "title": "Eternal Journey",
++    "director": "Catherine Baker",
++    "year": 1978,
++    "rating": 5,
++    "category": "DRAMA",
++    "status": "WATCHED"
+   }
+ ]
+\ No newline at end of file
+Index: src/main/java/com/zhou/movies/pojo/Movie.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.zhou.movies.pojo;\r\n\r\nimport java.util.Objects;\r\n\r\npublic class Movie {\r\n    private String title;\r\n    private String director;\r\n    private int year;\r\n    private int rating;\r\n    private Category category;\r\n    private Status status;\r\n\r\n    public Movie(Builder builder) {\r\n        this.title = builder.title;\r\n        this.director = builder.director;\r\n        this.year = builder.year;\r\n        this.category = builder.category;\r\n        this.status = builder.status;\r\n        this.rating = builder.rating;\r\n    }\r\n\r\n    public static class Builder{\r\n        private String title;\r\n        private String director;\r\n        private int year;\r\n        private int rating;\r\n        private Category category;\r\n        private Status status;\r\n\r\n        public Builder(String title, String director){\r\n            this.title = title;\r\n            this.director = director;\r\n        }\r\n\r\n        public Builder year(int year) { this.year = year; return this; }\r\n        public Builder category(Category c) { this.category = c; return this; }\r\n        public Builder status(Status s) { this.status = s; return this; }\r\n        public Builder rating(int r) { this.rating = r; return this; }\r\n\r\n        public Movie build() {\r\n            return new Movie(this);\r\n        }\r\n    }\r\n\r\n    public int getRating() {\r\n        return rating;\r\n    }\r\n\r\n    public void setRating(int rating) {\r\n        this.rating = rating;\r\n    }\r\n\r\n    public String getTitle() {\r\n        return title;\r\n    }\r\n\r\n    public void setTitle(String title) {\r\n        this.title = title;\r\n    }\r\n\r\n    public String getDirector() {\r\n        return director;\r\n    }\r\n\r\n    public void setDirector(String director) {\r\n        this.director = director;\r\n    }\r\n\r\n    public int getYear() {\r\n        return year;\r\n    }\r\n\r\n    public void setYear(int year) {\r\n        this.year = year;\r\n    }\r\n\r\n    public Category getCategory() {\r\n        return category;\r\n    }\r\n\r\n    public void setCategory(Category category) {\r\n        this.category = category;\r\n    }\r\n\r\n    public Status getStatus() {\r\n        return status;\r\n    }\r\n\r\n    public void setStatus(Status status) {\r\n        this.status = status;\r\n    }\r\n\r\n    @Override\r\n    public boolean equals(Object o) {\r\n        if (this == o) return true;\r\n        if (o == null || getClass() != o.getClass()) return false;\r\n        Movie movie = (Movie) o;\r\n        return year == movie.year && rating == movie.rating && Objects.equals(title, movie.title) && Objects.equals(director, movie.director) && category == movie.category && status == movie.status;\r\n    }\r\n\r\n    @Override\r\n    public int hashCode() {\r\n        return Objects.hash(title, director, year, rating, category, status);\r\n    }\r\n\r\n    @Override\r\n    public String toString() {\r\n        return \"Movie{\" +\r\n                \"title='\" + title + '\\'' +\r\n                \", director='\" + director + '\\'' +\r\n                \", year=\" + year +\r\n                \", rating=\" + rating +\r\n                \", category=\" + category +\r\n                \", status=\" + status +\r\n                '}';\r\n    }\r\n}\r\n\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/zhou/movies/pojo/Movie.java b/src/main/java/com/zhou/movies/pojo/Movie.java
+--- a/src/main/java/com/zhou/movies/pojo/Movie.java	(revision c76925cbf9439680a1691feb834db8fe65f3e9f0)
++++ b/src/main/java/com/zhou/movies/pojo/Movie.java	(date 1762528433219)
+@@ -1,16 +1,19 @@
+ package com.zhou.movies.pojo;
+ 
+ import java.util.Objects;
++import java.util.UUID;
+ 
+ public class Movie {
+-    private String title;
+-    private String director;
+-    private int year;
+-    private int rating;
+-    private Category category;
+-    private Status status;
++    private final String id;
++    private final String title;
++    private final String director;
++    private final int year;
++    private final int rating;
++    private final Category category;
++    private final Status status;
+ 
+     public Movie(Builder builder) {
++        this.id = builder.id;
+         this.title = builder.title;
+         this.director = builder.director;
+         this.year = builder.year;
+@@ -19,7 +22,12 @@
+         this.rating = builder.rating;
+     }
+ 
++    public Builder toBuilder() {
++        return new Builder(this);
++    }
++
+     public static class Builder{
++        private final String id;
+         private String title;
+         private String director;
+         private int year;
+@@ -28,10 +36,31 @@
+         private Status status;
+ 
+         public Builder(String title, String director){
++            this.id = UUID.randomUUID().toString();
+             this.title = title;
+             this.director = director;
+         }
+ 
++        private Builder(Movie movie) {
++            this.id = movie.id;
++            this.title = movie.title;
++            this.director = movie.director;
++            this.year = movie.year;
++            this.category = movie.category;
++            this.status = movie.status;
++            this.rating = movie.rating;
++        }
++
++        public Builder title(String title){
++            this.title = title;
++            return this;
++        }
++
++        public Builder director(String director){
++            this.director = director;
++            return this;
++        }
++
+         public Builder year(int year) { this.year = year; return this; }
+         public Builder category(Category c) { this.category = c; return this; }
+         public Builder status(Status s) { this.status = s; return this; }
+@@ -42,65 +71,45 @@
+         }
+     }
+ 
++    public String getId(){
++        return id;
++    }
++
+     public int getRating() {
+         return rating;
+     }
+ 
+-    public void setRating(int rating) {
+-        this.rating = rating;
+-    }
+-
+     public String getTitle() {
+         return title;
+     }
+ 
+-    public void setTitle(String title) {
+-        this.title = title;
+-    }
+-
+     public String getDirector() {
+         return director;
+     }
+ 
+-    public void setDirector(String director) {
+-        this.director = director;
+-    }
+-
+     public int getYear() {
+         return year;
+     }
+ 
+-    public void setYear(int year) {
+-        this.year = year;
+-    }
+-
+     public Category getCategory() {
+         return category;
+     }
+ 
+-    public void setCategory(Category category) {
+-        this.category = category;
+-    }
+-
+     public Status getStatus() {
+         return status;
+     }
+ 
+-    public void setStatus(Status status) {
+-        this.status = status;
+-    }
+-
+     @Override
+     public boolean equals(Object o) {
+         if (this == o) return true;
+         if (o == null || getClass() != o.getClass()) return false;
+         Movie movie = (Movie) o;
+-        return year == movie.year && rating == movie.rating && Objects.equals(title, movie.title) && Objects.equals(director, movie.director) && category == movie.category && status == movie.status;
++        return Objects.equals(id, movie.id);
+     }
+ 
+     @Override
+     public int hashCode() {
+-        return Objects.hash(title, director, year, rating, category, status);
++        return Objects.hash(id);
+     }
+ 
+     @Override
+Index: src/main/java/com/zhou/movies/service/MovieService.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.zhou.movies.service;\r\n\r\nimport com.zhou.movies.pojo.Movie;\r\n\r\nimport java.util.List;\r\n\r\npublic interface MovieService {\r\n    List<Movie> getAllMovies();\r\n    void addMovie(Movie movie);\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/zhou/movies/service/MovieService.java b/src/main/java/com/zhou/movies/service/MovieService.java
+--- a/src/main/java/com/zhou/movies/service/MovieService.java	(revision c76925cbf9439680a1691feb834db8fe65f3e9f0)
++++ b/src/main/java/com/zhou/movies/service/MovieService.java	(date 1762528417202)
+@@ -1,10 +1,28 @@
+ package com.zhou.movies.service;
+ 
++import com.zhou.movies.dto.MovieDTO;
++import com.zhou.movies.pojo.Category;
+ import com.zhou.movies.pojo.Movie;
++import com.zhou.movies.pojo.Status;
++import com.zhou.movies.service.strategy.SortDirection;
++import com.zhou.movies.service.strategy.SortStrategyType;
+ 
+ import java.util.List;
+ 
+ public interface MovieService {
+     List<Movie> getAllMovies();
+-    void addMovie(Movie movie);
++    void addMovie(MovieDTO dto) throws Exception;
++    void editMovie(String id, MovieDTO dto) throws Exception;
++    void deleteMovie(String id);
++
++    void setSortStrategy(SortStrategyType strategyType);
++    void setSortDirection(SortDirection sortDirection);
++
++    void setFilterCategory(Category category);
++    void setFilterStatus(Status status);
++    void setFilterRating(Integer rating);
++
++    void resetFiltersAndSort();
++
++    void setSearchQuery(String query);
+ }
+\ No newline at end of file
+Index: src/main/java/com/zhou/movies/repository/impl/MovieRepositoryJsonImpl.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.zhou.movies.repository.impl;\r\n\r\nimport com.google.gson.Gson;\r\nimport com.google.gson.GsonBuilder;\r\nimport com.google.gson.reflect.TypeToken;\r\nimport com.zhou.movies.pojo.Movie;\r\nimport com.zhou.movies.repository.MovieRepository;\r\n\r\nimport java.io.File;\r\nimport java.io.FileReader;\r\nimport java.io.FileWriter;\r\nimport java.io.IOException;\r\nimport java.lang.reflect.Type;\r\nimport java.util.ArrayList;\r\nimport java.util.List;\r\n\r\n/**\r\n * A Repository implementation that persists movie data to a JSON file.\r\n * This class handles all the logic for file I/O and JSON serialization/deserialization.\r\n */\r\npublic class MovieRepositoryJsonImpl implements MovieRepository {\r\n\r\n    private final String filePath;\r\n    private final Gson gson;\r\n\r\n    public MovieRepositoryJsonImpl(String filePath) {\r\n        this.filePath = filePath;\r\n        // Use GsonBuilder to create a \"pretty printing\" Gson instance.\r\n        // This makes the resulting movies.json file human-readable.\r\n        this.gson = new GsonBuilder().setPrettyPrinting().create();\r\n\r\n        // Ensure the JSON file exists on startup.\r\n        initFile();\r\n    }\r\n\r\n    /**\r\n     * Initializes the JSON file if it does not already exist.\r\n     * It writes an empty JSON array \"[]\" to the new file\r\n     * to prevent parse errors when \"findAll\" is called on an empty file.\r\n     */\r\n    private void initFile() {\r\n        File file = new File(filePath);\r\n        if (!file.exists()) {\r\n            try {\r\n                file.createNewFile();\r\n                try (FileWriter writer = new FileWriter(file)) {\r\n                    writer.write(\"[]\");\r\n                }\r\n            } catch (IOException e) {\r\n                e.printStackTrace();\r\n            }\r\n        }\r\n    }\r\n\r\n    @Override\r\n    public List<Movie> findAll() {\r\n        try (FileReader reader = new FileReader(filePath)) {\r\n\r\n            // This is the crucial part for deserializing generic types like List<T>.\r\n            // We must provide Gson with the *exact* type (List<Movie>)\r\n            // using a TypeToken, otherwise Gson only knows how to make a List of unknown objects.\r\n            Type listType = new TypeToken<List<Movie>>(){}.getType();\r\n\r\n            List<Movie> movies = gson.fromJson(reader, listType);\r\n\r\n            // If the file is empty or corrupted, gson.fromJson might return null.\r\n            // We must handle this case to avoid NullPointerExceptions.\r\n            if (movies == null) {\r\n                return new ArrayList<>();\r\n            }\r\n\r\n            return movies;\r\n\r\n        } catch (IOException e) {\r\n            e.printStackTrace();\r\n            return new ArrayList<>();\r\n        }\r\n    }\r\n\r\n    @Override\r\n    public void save(Movie movie) {\r\n        // The \"save\" operation for a JSON file is a \"Read-Modify-Write\" cycle.\r\n\r\n        // 1. Read: Get the current list of all movies.\r\n        // (If findAll() fails and returns an empty list, we risk overwriting data)\r\n        List<Movie> movies = findAll();\r\n\r\n        // 2. Modify: Add the new movie to the list in memory.\r\n        movies.add(movie);\r\n\r\n        // 3. Write: Overwrite the *entire file* with the new, modified list.\r\n        try (FileWriter writer = new FileWriter(filePath)) {\r\n            gson.toJson(movies, writer);\r\n        } catch (IOException e) {\r\n            e.printStackTrace();\r\n        }\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/zhou/movies/repository/impl/MovieRepositoryJsonImpl.java b/src/main/java/com/zhou/movies/repository/impl/MovieRepositoryJsonImpl.java
+--- a/src/main/java/com/zhou/movies/repository/impl/MovieRepositoryJsonImpl.java	(revision c76925cbf9439680a1691feb834db8fe65f3e9f0)
++++ b/src/main/java/com/zhou/movies/repository/impl/MovieRepositoryJsonImpl.java	(date 1762528417201)
+@@ -78,19 +78,9 @@
+     }
+ 
+     @Override
+-    public void save(Movie movie) {
+-        // The "save" operation for a JSON file is a "Read-Modify-Write" cycle.
+-
+-        // 1. Read: Get the current list of all movies.
+-        // (If findAll() fails and returns an empty list, we risk overwriting data)
+-        List<Movie> movies = findAll();
+-
+-        // 2. Modify: Add the new movie to the list in memory.
+-        movies.add(movie);
+-
+-        // 3. Write: Overwrite the *entire file* with the new, modified list.
++    public void saveAll(List<Movie> moviesListCache) {
+         try (FileWriter writer = new FileWriter(filePath)) {
+-            gson.toJson(movies, writer);
++            gson.toJson(moviesListCache, writer);
+         } catch (IOException e) {
+             e.printStackTrace();
+         }
+Index: src/main/java/com/zhou/movies/repository/MovieRepository.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.zhou.movies.repository;\r\n\r\nimport com.zhou.movies.pojo.Movie;\r\n\r\nimport java.util.List;\r\n\r\npublic interface MovieRepository {\r\n    List<Movie> findAll();\r\n    void save(Movie movie);\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/zhou/movies/repository/MovieRepository.java b/src/main/java/com/zhou/movies/repository/MovieRepository.java
+--- a/src/main/java/com/zhou/movies/repository/MovieRepository.java	(revision c76925cbf9439680a1691feb834db8fe65f3e9f0)
++++ b/src/main/java/com/zhou/movies/repository/MovieRepository.java	(date 1762528417199)
+@@ -6,5 +6,5 @@
+ 
+ public interface MovieRepository {
+     List<Movie> findAll();
+-    void save(Movie movie);
++    void saveAll(List<Movie> moviesListCache);
+ }
+Index: src/main/java/com/zhou/movies/service/impl/MovieServiceImpl.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.zhou.movies.service.impl;\r\n\r\nimport com.zhou.movies.pojo.Movie;\r\nimport com.zhou.movies.repository.MovieRepository;\r\nimport com.zhou.movies.service.MovieService;\r\nimport com.zhou.movies.service.Observer;\r\nimport com.zhou.movies.service.Subject;\r\n\r\nimport java.util.ArrayList;\r\nimport java.util.List;\r\n\r\npublic class MovieServiceImpl implements MovieService, Subject {\r\n    private final MovieRepository movieRepository;\r\n    private final List<Observer> observers;\r\n\r\n    public MovieServiceImpl(MovieRepository movieRepository){\r\n        this.movieRepository = movieRepository;\r\n        observers = new ArrayList<>();\r\n    }\r\n\r\n    @Override\r\n    public List<Movie> getAllMovies(){\r\n        return movieRepository.findAll();\r\n    }\r\n\r\n    @Override\r\n    public void addMovie(Movie movie){\r\n        movieRepository.save(movie);\r\n        notifyObservers();\r\n    }\r\n\r\n    @Override\r\n    public void addObserver(Observer observer) {\r\n        observers.add(observer);\r\n    }\r\n\r\n    @Override\r\n    public void removeObserver(Observer observer) {\r\n        observers.remove(observer);\r\n    }\r\n\r\n    @Override\r\n    public void notifyObservers() {\r\n        for (Observer observer : observers)\r\n            observer.update();\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/zhou/movies/service/impl/MovieServiceImpl.java b/src/main/java/com/zhou/movies/service/impl/MovieServiceImpl.java
+--- a/src/main/java/com/zhou/movies/service/impl/MovieServiceImpl.java	(revision c76925cbf9439680a1691feb834db8fe65f3e9f0)
++++ b/src/main/java/com/zhou/movies/service/impl/MovieServiceImpl.java	(date 1762528417203)
+@@ -1,31 +1,135 @@
+ package com.zhou.movies.service.impl;
+ 
++import com.zhou.movies.dto.MovieDTO;
++import com.zhou.movies.pojo.Category;
+ import com.zhou.movies.pojo.Movie;
++import com.zhou.movies.pojo.Status;
++import com.zhou.movies.service.strategy.SortDirection;
++import com.zhou.movies.service.strategy.SortStrategyType;
+ import com.zhou.movies.repository.MovieRepository;
+ import com.zhou.movies.service.MovieService;
+ import com.zhou.movies.service.Observer;
++import com.zhou.movies.service.strategy.SortingStrategy;
+ import com.zhou.movies.service.Subject;
++import com.zhou.movies.service.strategy.impl.SortByRatingStrategy;
++import com.zhou.movies.service.strategy.impl.SortByTitleStrategy;
++import com.zhou.movies.service.strategy.impl.SortByYearStrategy;
+ 
+ import java.util.ArrayList;
+ import java.util.List;
++import java.util.stream.Collectors;
+ 
+ public class MovieServiceImpl implements MovieService, Subject {
+     private final MovieRepository movieRepository;
+     private final List<Observer> observers;
+ 
++    private final List<Movie> moviesListCache;
++    private SortingStrategy currentSortingStrategy;
++    private SortDirection currentSortDirection;
++
++    private Category currentFilterCategory = null;
++    private Status currentFilterStatus = null;
++    private Integer currentFilterRating = null;
++
++    private String currentSearchQuery = null;
++
+     public MovieServiceImpl(MovieRepository movieRepository){
+         this.movieRepository = movieRepository;
+-        observers = new ArrayList<>();
++        this.observers = new ArrayList<>();
++
++        this.moviesListCache = movieRepository.findAll();
++
++        this.currentSortingStrategy = new SortByTitleStrategy();
++        this.currentSortDirection = SortDirection.ASCENDING;
+     }
+ 
+     @Override
+     public List<Movie> getAllMovies(){
+-        return movieRepository.findAll();
++        // Apply search params if exist
++        List<Movie> searchResults;
++        if (currentSearchQuery == null) {
++            searchResults = new ArrayList<>(moviesListCache);
++        } else {
++            String queryLower = currentSearchQuery.toLowerCase();
++            searchResults = moviesListCache.stream()
++                    .filter(movie ->
++                            movie.getTitle().toLowerCase().contains(queryLower) ||
++                                    movie.getDirector().toLowerCase().contains(queryLower)
++                    )
++                    .collect(Collectors.toList());
++        }
++
++        // Filtering result of searched movies with selected categories
++        List<Movie> filteredMovies = searchResults.stream()
++                .filter(movie -> (currentFilterCategory == null || movie.getCategory().equals(currentFilterCategory)))
++                .filter(movie -> (currentFilterStatus == null || movie.getStatus().equals(currentFilterStatus)))
++                .filter(movie -> (currentFilterRating == null || movie.getRating() == currentFilterRating))
++                .collect(Collectors.toList());
++
++        // Sorting filtered Movies with the selected strategy
++        if (currentSortingStrategy != null) {
++            currentSortingStrategy.sort(filteredMovies, currentSortDirection);
++        }
++
++        return filteredMovies;
++    }
++
++    @Override
++    public void deleteMovie(String id) {
++        // Remove the movie from cache using its unique ID
++        moviesListCache.removeIf(movie -> movie.getId().equals(id));
++
++        // Update the JSON file (by overwriting with the new cache)
++        movieRepository.saveAll(moviesListCache);
++
++        // Notify all observers (View) to refresh
++        notifyObservers();
+     }
+ 
+     @Override
+-    public void addMovie(Movie movie){
+-        movieRepository.save(movie);
++    public void addMovie(MovieDTO dto) throws Exception {
++        int year = Integer.parseInt(dto.yearStr);
++
++        // Build a new domain object (Movie)
++        Movie movie = new Movie.Builder(dto.title, dto.director)
++                .year(year)
++                .category(dto.category)
++                .status(dto.status)
++                .rating(dto.rating)
++                .build();
++
++        // Save to cache and persist changes
++        moviesListCache.add(movie);
++        movieRepository.saveAll(moviesListCache);
++
++        // Notify observers to refresh the view
++        notifyObservers();
++    }
++
++    @Override
++    public void editMovie(String id, MovieDTO dto) throws Exception {
++        // Find the original movie by ID or throw if not found
++        Movie originalMovie = moviesListCache.stream()
++                .filter(m -> m.getId().equals(id))
++                .findFirst()
++                .orElseThrow(() -> new Exception("Movie not found with id: " + id));
++
++        int year = Integer.parseInt(dto.yearStr);
++
++        // Create an updated Movie object
++        Movie updatedMovie = originalMovie.toBuilder()
++                .title(dto.title)
++                .director(dto.director)
++                .year(year)
++                .category(dto.category)
++                .status(dto.status)
++                .rating(dto.rating)
++                .build();
++
++        // Replace in cache, persist, and notify observers
++        int index = moviesListCache.indexOf(originalMovie);
++        moviesListCache.set(index, updatedMovie);
++        movieRepository.saveAll(moviesListCache);
+         notifyObservers();
+     }
+ 
+@@ -44,4 +148,68 @@
+         for (Observer observer : observers)
+             observer.update();
+     }
++
++    @Override
++    public void setSortStrategy(SortStrategyType strategyType){
++        if (strategyType == null)
++            strategyType = SortStrategyType.TITLE;
++
++        switch (strategyType){
++            case YEAR:
++                currentSortingStrategy = new SortByYearStrategy();
++                break;
++            case RATING:
++                currentSortingStrategy = new SortByRatingStrategy();
++                break;
++            default:
++                currentSortingStrategy = new SortByTitleStrategy();
++                break;
++        }
++
++        notifyObservers();
++    }
++
++    @Override
++    public void setSortDirection(SortDirection sortDirection){
++        currentSortDirection = sortDirection;
++        notifyObservers();
++    }
++
++    @Override
++    public void setFilterCategory(Category category) {
++        this.currentFilterCategory = category;
++        notifyObservers();
++    }
++
++    @Override
++    public void setFilterStatus(Status status) {
++        this.currentFilterStatus = status;
++        notifyObservers();
++    }
++
++    @Override
++    public void setFilterRating(Integer rating) {
++        this.currentFilterRating = rating;
++        notifyObservers();
++    }
++
++    @Override
++    public void resetFiltersAndSort() {
++        this.currentFilterCategory = null;
++        this.currentFilterStatus = null;
++        this.currentFilterRating = null;
++
++        this.currentSearchQuery = null;
++
++        this.currentSortingStrategy = new SortByTitleStrategy();
++        this.currentSortDirection = SortDirection.ASCENDING;
++
++        notifyObservers();
++    }
++
++    @Override
++    public void setSearchQuery(String query) {
++        this.currentSearchQuery = (query == null || query.trim().isEmpty()) ? null : query.trim();
++        notifyObservers();
++    }
+ }
+Index: src/main/java/com/zhou/movies/view/MovieView.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.zhou.movies.view;\r\n\r\nimport com.zhou.movies.controller.MovieController;\r\nimport com.zhou.movies.dto.MovieDTO;\r\nimport com.zhou.movies.pojo.Movie;\r\nimport com.zhou.movies.service.Observer;\r\n\r\nimport javax.swing.*;\r\nimport javax.swing.table.DefaultTableModel;\r\nimport java.awt.*;\r\nimport java.util.List;\r\n\r\npublic class MovieView extends JFrame implements Observer {\r\n    private MovieController controller;\r\n\r\n    private JTable movieTable;\r\n    private DefaultTableModel tableModel;\r\n\r\n    private MovieInputPanel inputPanel;\r\n\r\n    public MovieView() {\r\n        setTitle(\"My movies collection\");\r\n        setSize(1200, 600);\r\n        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);\r\n        setLocationRelativeTo(null);\r\n\r\n        initComponents();\r\n    }\r\n\r\n    public void setController(MovieController controller) {\r\n        this.controller = controller;\r\n    }\r\n\r\n    private void initComponents() {\r\n        // --- Table ---\r\n        String[] columnNames = {\"Title\", \"Director\", \"Year\", \"Category\", \"Status\", \"Rating\"};\r\n        tableModel = new DefaultTableModel(columnNames, 0);\r\n        movieTable = new JTable(tableModel);\r\n\r\n        // --- Initialize Sub Input Panel ---\r\n        inputPanel = new MovieInputPanel();\r\n\r\n        // --- Initialize Layout ---\r\n        setLayout(new BorderLayout());\r\n        add(new JScrollPane(movieTable), BorderLayout.CENTER);\r\n        add(inputPanel, BorderLayout.SOUTH);\r\n\r\n        inputPanel.getAddButton().addActionListener(e -> {\r\n            if (controller != null) {\r\n\r\n                //1. View creates a DTO\r\n                MovieDTO movieDTO = new MovieDTO(\r\n                        inputPanel.getTitleText(),\r\n                        inputPanel.getDirectorText(),\r\n                        inputPanel.getYearText(),\r\n                        inputPanel.getSelectedCategory(),\r\n                        inputPanel.getSelectedStatus(),\r\n                        inputPanel.getSelectedRating()\r\n                );\r\n\r\n                //2. Passing only ONE parameter to controller!!!\r\n                boolean success = controller.addMovieRequest(movieDTO);\r\n\r\n                if (success) {\r\n                    inputPanel.clearFields();\r\n                } else {\r\n                    JOptionPane.showMessageDialog(this, \"Insertion Failed: Pls check the input data!\", \"Error\", JOptionPane.ERROR_MESSAGE);\r\n                }\r\n            }\r\n        });\r\n    }\r\n\r\n    public void refreshTable(List<Movie> movies) {\r\n        tableModel.setRowCount(0);\r\n\r\n        for (Movie movie : movies) {\r\n            Object[] row = {\r\n                    movie.getTitle(),\r\n                    movie.getDirector(),\r\n                    movie.getYear(),\r\n                    movie.getCategory(),\r\n                    movie.getStatus(),\r\n                    movie.getRating()\r\n            };\r\n            tableModel.addRow(row);\r\n        }\r\n    }\r\n\r\n    @Override\r\n    public void update() {\r\n        List<Movie> updatedMovies = controller.getAllMovies();\r\n        refreshTable(updatedMovies);\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/zhou/movies/view/MovieView.java b/src/main/java/com/zhou/movies/view/MovieView.java
+--- a/src/main/java/com/zhou/movies/view/MovieView.java	(revision c76925cbf9439680a1691feb834db8fe65f3e9f0)
++++ b/src/main/java/com/zhou/movies/view/MovieView.java	(date 1762528438939)
+@@ -2,25 +2,45 @@
+ 
+ import com.zhou.movies.controller.MovieController;
+ import com.zhou.movies.dto.MovieDTO;
++import com.zhou.movies.pojo.Category;
+ import com.zhou.movies.pojo.Movie;
++import com.zhou.movies.pojo.Status;
+ import com.zhou.movies.service.Observer;
++import com.zhou.movies.service.strategy.SortDirection;
++import com.zhou.movies.service.strategy.SortStrategyType;
++import com.zhou.movies.view.state.FormState;
++import com.zhou.movies.view.state.impl.AddModeState;
++import com.zhou.movies.view.state.impl.EditModeState;
+ 
+ import javax.swing.*;
++import javax.swing.border.EmptyBorder;
+ import javax.swing.table.DefaultTableModel;
++
+ import java.awt.*;
+ import java.util.List;
+ 
++/**
++ * Acts as the View in the MVC pattern.
++ * Handles UI display, user interactions, and communication with the controller.
++ * Updates the movie table when data changes.
++ */
+ public class MovieView extends JFrame implements Observer {
+     private MovieController controller;
+ 
+     private JTable movieTable;
+     private DefaultTableModel tableModel;
+-
+     private MovieInputPanel inputPanel;
++    private ToolbarPanel toolbarPanel;
++    private ActionPanel actionPanel;
++
++    private List<Movie> currentMoviesList;
++
++    private FormState currentState;
++    private Movie movieToEdit = null;
+ 
+     public MovieView() {
+         setTitle("My movies collection");
+-        setSize(1200, 600);
++        setSize(1300, 600);
+         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+         setLocationRelativeTo(null);
+ 
+@@ -29,44 +49,193 @@
+ 
+     public void setController(MovieController controller) {
+         this.controller = controller;
++
++        this.currentState = new AddModeState();
++        this.currentState.enterState(this);
++
++        this.update();
++    }
++
++    public MovieController getController(){
++        return controller;
+     }
+ 
+     private void initComponents() {
+         // --- Table ---
+         String[] columnNames = {"Title", "Director", "Year", "Category", "Status", "Rating"};
+-        tableModel = new DefaultTableModel(columnNames, 0);
++        tableModel = new DefaultTableModel(columnNames, 0) {
++            @Override
++            public boolean isCellEditable(int row, int column) {
++                return false;
++            }
++        };
++
+         movieTable = new JTable(tableModel);
++        movieTable.getTableHeader().setReorderingAllowed(false);
+ 
+-        // --- Initialize Sub Input Panel ---
++        // --- Initialize Sub Panels ---
+         inputPanel = new MovieInputPanel();
++        toolbarPanel = new ToolbarPanel();
++        actionPanel = new ActionPanel();
++
++        inputPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+ 
+         // --- Initialize Layout ---
+         setLayout(new BorderLayout());
++        add(toolbarPanel, BorderLayout.NORTH);
+         add(new JScrollPane(movieTable), BorderLayout.CENTER);
+         add(inputPanel, BorderLayout.SOUTH);
+ 
+-        inputPanel.getAddButton().addActionListener(e -> {
++        add(actionPanel, BorderLayout.EAST); // 添加到布局的东侧
++        // --- Linking Listeners to buttons ---
++        initListeners();
++    }
++
++
++    private void initListeners(){
++        initFormListeners();
++        initEditDeleteListeners();
++        initSortAndFilterListeners();
++        initSearchListeners();
++    }
++
++    private void initSearchListeners() {
++        // Search Action
++        Runnable searchAction = () -> {
+             if (controller != null) {
++                String query = toolbarPanel.getSearchQuery();
++                controller.searchMovies(query);
++            }
++        };
++
++        // Search with button
++        toolbarPanel.getSearchButton().addActionListener(e -> searchAction.run());
+ 
+-                //1. View creates a DTO
+-                MovieDTO movieDTO = new MovieDTO(
+-                        inputPanel.getTitleText(),
+-                        inputPanel.getDirectorText(),
+-                        inputPanel.getYearText(),
+-                        inputPanel.getSelectedCategory(),
+-                        inputPanel.getSelectedStatus(),
+-                        inputPanel.getSelectedRating()
+-                );
++        // Search with Enter
++        toolbarPanel.getSearchField().addActionListener(e -> searchAction.run());
++    }
++
++    private void initFormListeners(){
++        // --- Submit button listener ---
++        inputPanel.getSubmitButton().addActionListener(e -> {
++            if (controller == null) return;
++
++            // Create DTO from form
++            MovieDTO dto = new MovieDTO(
++                    inputPanel.getTitleText(),
++                    inputPanel.getDirectorText(),
++                    inputPanel.getYearText(),
++                    inputPanel.getSelectedCategory(),
++                    inputPanel.getSelectedStatus(),
++                    inputPanel.getSelectedRating()
++            );
+ 
+-                //2. Passing only ONE parameter to controller!!!
+-                boolean success = controller.addMovieRequest(movieDTO);
++            FormState nextState = currentState.handleSubmit(this, dto);
++
++            if (nextState != this.currentState){
++                this.currentState = nextState;
++                this.currentState.enterState(this);
++            }
++        });
++
++        inputPanel.getCancelButton().addActionListener(e -> {
++            this.currentState = new AddModeState();
++            this.currentState.enterState(this);
++        });
++    }
++
++    private void initEditDeleteListeners() {
++        // --- Edit Button Listener ---
++        actionPanel.getEditButton().addActionListener(e -> {
++            int viewRow = movieTable.getSelectedRow();
++            if (viewRow == -1) {
++                JOptionPane.showMessageDialog(this, "Please select a movie to edit");
++                return;
++            }
++            int modelRow = movieTable.convertRowIndexToModel(viewRow);
++            this.movieToEdit = this.currentMoviesList.get(modelRow);
++
++            this.currentState = new EditModeState(this.movieToEdit);
++            this.currentState.enterState(this);
++        });
+ 
+-                if (success) {
+-                    inputPanel.clearFields();
++        // --- Delete Button Listener ---
++        actionPanel.getDeleteButton().addActionListener(e -> {
++            int viewRow = movieTable.getSelectedRow();
++            if (viewRow == -1) {
++                JOptionPane.showMessageDialog(this, "Please select a movie to delete");
++                return;
++            }
++            int choice = JOptionPane.showConfirmDialog(this,
++                    "Are you sure you want to delete the selected movie?",
++                    "Confirm Delete",
++                    JOptionPane.YES_NO_OPTION);
++            if (choice != JOptionPane.YES_OPTION) {
++                return;
++            }
++            int modelRow = movieTable.convertRowIndexToModel(viewRow);
++            Movie movieToDelete = this.currentMoviesList.get(modelRow);
++            controller.deleteMovie(movieToDelete.getId());
++        });
++    }
++
++    private void initSortAndFilterListeners() {
++        // --- Sort ComboBox ---
++        toolbarPanel.getSortComboBox().addActionListener(e -> {
++            if (controller != null) {
++                SortStrategyType selectedStrategy = (SortStrategyType) toolbarPanel.getSortComboBox().getSelectedItem();
++                controller.changeSortStrategy(selectedStrategy);
++            }
++        });
++
++        // --- Sort Direction Button ---
++        toolbarPanel.getSortDirectionButton().addActionListener(e -> {
++            if (controller != null) {
++                JToggleButton button = toolbarPanel.getSortDirectionButton();
++                if (button.isSelected()) {
++                    button.setText("Descending ⬇️");
++                    controller.changeSortDirection(SortDirection.DESCENDING);
+                 } else {
+-                    JOptionPane.showMessageDialog(this, "Insertion Failed: Pls check the input data!", "Error", JOptionPane.ERROR_MESSAGE);
++                    button.setText("Ascending ⬆️");
++                    controller.changeSortDirection(SortDirection.ASCENDING);
+                 }
+             }
++        });
++
++        // --- Category Filter ---
++        toolbarPanel.getCategoryFilterComboBox().addActionListener(e -> {
++            if (controller != null) {
++                Category selected = (Category) toolbarPanel.getCategoryFilterComboBox().getSelectedItem();
++                controller.setFilterCategory(selected);
++            }
++        });
++
++        // --- Status Filter ---
++        toolbarPanel.getStatusFilterComboBox().addActionListener(e -> {
++            if (controller != null) {
++                Status selected = (Status) toolbarPanel.getStatusFilterComboBox().getSelectedItem();
++                controller.setFilterStatus(selected);
++            }
++        });
++
++        // --- Rating Filter ---
++        toolbarPanel.getRatingFilterComboBox().addActionListener(e -> {
++            if (controller != null) {
++                Integer selected = (Integer) toolbarPanel.getRatingFilterComboBox().getSelectedItem();
++                controller.setFilterRating(selected);
++            }
++        });
++
++        // --- Reset Button ---
++        toolbarPanel.getResetButton().addActionListener(e -> {
++            if (controller != null) {
++                controller.resetFiltersAndSort();
++                toolbarPanel.resetFilterControls();
++                toolbarPanel.resetSortControls();
++
++                this.currentState = new AddModeState();
++                this.currentState.enterState(this);
++            }
+         });
+     }
+ 
+@@ -86,9 +255,36 @@
+         }
+     }
+ 
++    public void selectRowById(String movieId) {
++        int modelRowIndex = -1;
++        for (int i = 0; i < currentMoviesList.size(); i++) {
++            if (currentMoviesList.get(i).getId().equals(movieId)) {
++                modelRowIndex = i;
++                break;
++            }
++        }
++
++        if (modelRowIndex != -1) {
++            int viewRowIndex = movieTable.convertRowIndexToView(modelRowIndex);
++
++            if (viewRowIndex != -1) {
++                movieTable.setRowSelectionInterval(viewRowIndex, viewRowIndex);
++                movieTable.scrollRectToVisible(movieTable.getCellRect(viewRowIndex, 0, true));
++            }
++        }
++    }
++
++    public MovieInputPanel getInputPanel() {
++        return this.inputPanel;
++    }
++
++    public void setMovieToEdit(Movie movie) {
++        this.movieToEdit = movie;
++    }
++
+     @Override
+     public void update() {
+-        List<Movie> updatedMovies = controller.getAllMovies();
+-        refreshTable(updatedMovies);
++        this.currentMoviesList = controller.getAllMovies();
++        refreshTable(currentMoviesList);
+     }
+ }
+\ No newline at end of file
