@@ -8,11 +8,13 @@ import com.zhou.movies.pojo.Status;
 import com.zhou.movies.service.Observer;
 import com.zhou.movies.service.strategy.SortDirection;
 import com.zhou.movies.service.strategy.SortStrategyType;
+import com.zhou.movies.view.state.FormState;
+import com.zhou.movies.view.state.impl.AddModeState;
+import com.zhou.movies.view.state.impl.EditModeState;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
-import static com.zhou.movies.view.MovieInputPanel.FormMode;
 
 import java.awt.*;
 import java.util.List;
@@ -33,7 +35,7 @@ public class MovieView extends JFrame implements Observer {
 
     private List<Movie> currentMoviesList;
 
-    private FormMode currentMode = FormMode.ADD;
+    private FormState currentState;
     private Movie movieToEdit = null;
 
     public MovieView() {
@@ -47,7 +49,15 @@ public class MovieView extends JFrame implements Observer {
 
     public void setController(MovieController controller) {
         this.controller = controller;
+
+        this.currentState = new AddModeState();
+        this.currentState.enterState(this);
+
         this.update();
+    }
+
+    public MovieController getController(){
+        return controller;
     }
 
     private void initComponents() {
@@ -120,28 +130,18 @@ public class MovieView extends JFrame implements Observer {
                     inputPanel.getSelectedRating()
             );
 
-            // Handle ADD / EDIT mode
-            if (currentMode == FormMode.ADD) {
-                boolean success = controller.addMovieRequest(dto);
-                if (success) {
-                    inputPanel.clearFields();
-                } else {
-                    JOptionPane.showMessageDialog(this, "Insertion Failed: Please check the input data!", "Error", JOptionPane.ERROR_MESSAGE);
-                }
-            } else {
-                // Edit mode
-                String idToSelect = movieToEdit.getId();
-                boolean success = controller.editMovieRequest(idToSelect, dto);
-                if (success) {
-                    selectRowById(idToSelect);
-                    setGlobalMode(FormMode.ADD);
-                } else {
-                    JOptionPane.showMessageDialog(this, "Update Failed: Please check the input data!", "Error", JOptionPane.ERROR_MESSAGE);
-                }
+            FormState nextState = currentState.handleSubmit(this, dto);
+
+            if (nextState != this.currentState){
+                this.currentState = nextState;
+                this.currentState.enterState(this);
             }
         });
 
-        inputPanel.getCancelButton().addActionListener(e -> setGlobalMode(FormMode.ADD));
+        inputPanel.getCancelButton().addActionListener(e -> {
+            this.currentState = new AddModeState();
+            this.currentState.enterState(this);
+        });
     }
 
     private void initEditDeleteListeners() {
@@ -154,8 +154,9 @@ public class MovieView extends JFrame implements Observer {
             }
             int modelRow = movieTable.convertRowIndexToModel(viewRow);
             this.movieToEdit = this.currentMoviesList.get(modelRow);
-            inputPanel.populateForm(this.movieToEdit);
-            setGlobalMode(FormMode.EDIT);
+
+            this.currentState = new EditModeState(this.movieToEdit);
+            this.currentState.enterState(this);
         });
 
         // --- Delete Button Listener ---
@@ -231,7 +232,9 @@ public class MovieView extends JFrame implements Observer {
                 controller.resetFiltersAndSort();
                 toolbarPanel.resetFilterControls();
                 toolbarPanel.resetSortControls();
-                setGlobalMode(FormMode.ADD);
+
+                this.currentState = new AddModeState();
+                this.currentState.enterState(this);
             }
         });
     }
@@ -252,19 +255,7 @@ public class MovieView extends JFrame implements Observer {
         }
     }
 
-    private void setGlobalMode(FormMode mode) {
-        this.currentMode = mode;
-
-        if (mode == FormMode.ADD) {
-            inputPanel.clearFields();
-            this.movieToEdit = null;
-        } else {
-            inputPanel.setMode(FormMode.EDIT);
-            inputPanel.focusTitleField();
-        }
-    }
-
-    private void selectRowById(String movieId) {
+    public void selectRowById(String movieId) {
         int modelRowIndex = -1;
         for (int i = 0; i < currentMoviesList.size(); i++) {
             if (currentMoviesList.get(i).getId().equals(movieId)) {
@@ -281,6 +272,14 @@ public class MovieView extends JFrame implements Observer {
                 movieTable.scrollRectToVisible(movieTable.getCellRect(viewRowIndex, 0, true));
             }
         }
+    }
+
+    public MovieInputPanel getInputPanel() {
+        return this.inputPanel;
+    }
+
+    public void setMovieToEdit(Movie movie) {
+        this.movieToEdit = movie;
     }
 
     @Override

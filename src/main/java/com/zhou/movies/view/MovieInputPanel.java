@@ -13,9 +13,6 @@ import java.awt.*;
  * Its Single Responsibility is to gather data for creating a new movie.
  */
 public class MovieInputPanel extends JPanel {
-
-    public enum FormMode{ ADD, EDIT }
-
     private final JTextField titleField = new JTextField(20);
     private final JTextField directorField = new JTextField(20);
     private final JTextField yearField = new JTextField(5);
@@ -52,8 +49,6 @@ public class MovieInputPanel extends JPanel {
         // Initialize form buttons
         add(submitButton);
         add(cancelButton);
-
-        setMode(FormMode.ADD);
     }
 
     public String getTitleText() { return titleField.getText(); }
@@ -76,8 +71,6 @@ public class MovieInputPanel extends JPanel {
         categoryJComboBox.setSelectedIndex(0);
         statusComboBox.setSelectedIndex(0);
         ratingComboBox.setSelectedIndex(0);
-
-        setMode(FormMode.ADD);
     }
 
     public void populateForm(Movie movie) {
@@ -87,16 +80,6 @@ public class MovieInputPanel extends JPanel {
         categoryJComboBox.setSelectedItem(movie.getCategory());
         statusComboBox.setSelectedItem(movie.getStatus());
         ratingComboBox.setSelectedItem(movie.getRating());
-    }
-
-    public void setMode(FormMode mode){
-        if (mode == FormMode.ADD){
-            submitButton.setText("ADD");
-            cancelButton.setVisible(false);
-        }else{
-            submitButton.setText("UPDATE");
-            cancelButton.setVisible(true);
-        }
     }
 
     public void focusTitleField() {

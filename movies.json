@@ -55,8 +55,8 @@
   },
   {
     "id": "a7b8c9d0-e1f2-4a3b-4c5d-6e7f8a9b0c1d",
-    "title": "Echoes of War",
-    "director": "Thomas Anderson",
+    "title": "asdfaf",
+    "director": "Thomasasdf",
     "year": 2012,
     "rating": 4,
     "category": "ACTION",
@@ -225,15 +225,6 @@
     "status": "WATCHING"
   },
   {
-    "id": "b6c7d8e9-f0a1-4b2c-3d4e-5f6a7b8c9d0e",
-    "title": "Cosmic Awakening",
-    "director": "Rachel Stone",
-    "year": 2020,
-    "rating": 4,
-    "category": "SCI_FI",
-    "status": "WATCHED"
-  },
-  {
     "id": "c7d8e9f0-a1b2-4c3d-4e5f-6a7b8c9d0e1f",
     "title": "The Cursed Mansion",
     "director": "Gregory Hunt",
@@ -385,15 +376,6 @@
     "rating": 4,
     "category": "HORROR",
     "status": "WANT_TO_WATCH"
-  },
-  {
-    "id": "b4c5d6e7-f8a9-4b0c-1d2e-3f4a5b6c7d8f",
-    "title": "Ocean\u0027s Whisper",
-    "director": "Diana Young",
-    "year": 1996,
-    "rating": 5,
-    "category": "DRAMA",
-    "status": "WATCHED"
   },
   {
     "id": "c5d6e7f8-a9b0-4c1d-2e3f-4a5b6c7d8e9g",
