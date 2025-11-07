@@ -21,25 +21,30 @@ public class ToolbarPanel extends JToolBar {
     private final JComboBox<Status> statusFilterComboBox;
     private final JComboBox<Integer> ratingFilterComboBox;
     private final JButton resetButton;
-    private final JButton editButton;
-    private final JButton deleteButton;
 
     private final JTextField searchField;
     private final JButton searchButton;
 
     public ToolbarPanel() {
-        add(new JLabel("Sort by:"));
+
+        // ---------------------------------
+        // Group 1: SORTING
+        // ---------------------------------
+        add(new JLabel(" Sort by: "));
         sortComboBox = new JComboBox<>(SortStrategyType.values());
         add(sortComboBox);
 
-        // sort direction toggle
         sortDirectionButton = new JToggleButton("Ascending ⬆️");
         sortDirectionButton.setSelected(false);
         add(sortDirectionButton);
 
+        // --- SEPARATOR ---
         addSeparator();
 
-        add(new JLabel("Filter by:"));
+        // ---------------------------------
+        // Group 2: FILTERING
+        // ---------------------------------
+        add(new JLabel(" Filter by: "));
 
         // category filter
         categoryFilterComboBox = createEnumComboBox(Category.values());
@@ -54,26 +59,29 @@ public class ToolbarPanel extends JToolBar {
         ratingFilterComboBox = createEnumComboBox(ratings);
         add(ratingFilterComboBox);
 
-        // reset all fields button
-        resetButton = new JButton("Reset 🔄");
-        add(resetButton);
+        // --- SEPARATOR ---
+        addSeparator();
 
-        // edite movie button
-        editButton = new JButton("Edit ✍️");
-        add(editButton);
-
-        // delete movie button
-        deleteButton = new JButton("Delete 🗑️");
-        add(deleteButton);
-
-        add(new JSeparator(SwingConstants.VERTICAL));
-
+        // ---------------------------------
+        // Group 3: SEARCHING
+        // ---------------------------------
         add(new JLabel(" Search: "));
-        searchField = new JTextField(15); // 设置搜索框的默认宽度
+        searchField = new JTextField(12);
         add(searchField);
 
-        searchButton = new JButton("Find");
+        searchButton = new JButton("Search \uD83D\uDD0D");
         add(searchButton);
+
+        // --- SEPARATOR ---
+        addSeparator();
+
+        // ---------------------------------
+        // Group 4: GLOBAL ACTIONS
+        // ---------------------------------
+        resetButton = new JButton("Reset All 🔄");
+        resetButton.setPreferredSize(new Dimension(120, 28));
+        add(resetButton);
+
     }
 
     //Create ComboBox with "All" (null) option
@@ -119,14 +127,6 @@ public class ToolbarPanel extends JToolBar {
 
     public JButton getResetButton() {
         return resetButton;
-    }
-
-    public JButton getEditButton(){
-        return editButton;
-    }
-
-    public JButton getDeleteButton() {
-        return deleteButton;
     }
 
     public JButton getSearchButton() {

@@ -10,6 +10,7 @@ import com.zhou.movies.service.strategy.SortDirection;
 import com.zhou.movies.service.strategy.SortStrategyType;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import static com.zhou.movies.view.MovieInputPanel.FormMode;
 
@@ -28,6 +29,7 @@ public class MovieView extends JFrame implements Observer {
     private DefaultTableModel tableModel;
     private MovieInputPanel inputPanel;
     private ToolbarPanel toolbarPanel;
+    private ActionPanel actionPanel;
 
     private List<Movie> currentMoviesList;
 
@@ -36,7 +38,7 @@ public class MovieView extends JFrame implements Observer {
 
     public MovieView() {
         setTitle("My movies collection");
-        setSize(1200, 600);
+        setSize(1300, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
@@ -64,6 +66,9 @@ public class MovieView extends JFrame implements Observer {
         // --- Initialize Sub Panels ---
         inputPanel = new MovieInputPanel();
         toolbarPanel = new ToolbarPanel();
+        actionPanel = new ActionPanel();
+
+        inputPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
 
         // --- Initialize Layout ---
         setLayout(new BorderLayout());
@@ -71,6 +76,7 @@ public class MovieView extends JFrame implements Observer {
         add(new JScrollPane(movieTable), BorderLayout.CENTER);
         add(inputPanel, BorderLayout.SOUTH);
 
+        add(actionPanel, BorderLayout.EAST); // 添加到布局的东侧
         // --- Linking Listeners to buttons ---
         initListeners();
     }
@@ -124,8 +130,10 @@ public class MovieView extends JFrame implements Observer {
                 }
             } else {
                 // Edit mode
-                boolean success = controller.editMovieRequest(movieToEdit.getId(), dto);
+                String idToSelect = movieToEdit.getId();
+                boolean success = controller.editMovieRequest(idToSelect, dto);
                 if (success) {
+                    selectRowById(idToSelect);
                     setGlobalMode(FormMode.ADD);
                 } else {
                     JOptionPane.showMessageDialog(this, "Update Failed: Please check the input data!", "Error", JOptionPane.ERROR_MESSAGE);
@@ -138,7 +146,7 @@ public class MovieView extends JFrame implements Observer {
 
     private void initEditDeleteListeners() {
         // --- Edit Button Listener ---
-        toolbarPanel.getEditButton().addActionListener(e -> {
+        actionPanel.getEditButton().addActionListener(e -> {
             int viewRow = movieTable.getSelectedRow();
             if (viewRow == -1) {
                 JOptionPane.showMessageDialog(this, "Please select a movie to edit");
@@ -151,7 +159,7 @@ public class MovieView extends JFrame implements Observer {
         });
 
         // --- Delete Button Listener ---
-        toolbarPanel.getDeleteButton().addActionListener(e -> {
+        actionPanel.getDeleteButton().addActionListener(e -> {
             int viewRow = movieTable.getSelectedRow();
             if (viewRow == -1) {
                 JOptionPane.showMessageDialog(this, "Please select a movie to delete");
@@ -253,6 +261,25 @@ public class MovieView extends JFrame implements Observer {
         } else {
             inputPanel.setMode(FormMode.EDIT);
             inputPanel.focusTitleField();
+        }
+    }
+
+    private void selectRowById(String movieId) {
+        int modelRowIndex = -1;
+        for (int i = 0; i < currentMoviesList.size(); i++) {
+            if (currentMoviesList.get(i).getId().equals(movieId)) {
+                modelRowIndex = i;
+                break;
+            }
+        }
+
+        if (modelRowIndex != -1) {
+            int viewRowIndex = movieTable.convertRowIndexToView(modelRowIndex);
+
+            if (viewRowIndex != -1) {
+                movieTable.setRowSelectionInterval(viewRowIndex, viewRowIndex);
+                movieTable.scrollRectToVisible(movieTable.getCellRect(viewRowIndex, 0, true));
+            }
         }
     }
 

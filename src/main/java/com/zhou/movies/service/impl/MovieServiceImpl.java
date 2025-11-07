@@ -210,6 +210,6 @@ public class MovieServiceImpl implements MovieService, Subject {
     @Override
     public void setSearchQuery(String query) {
         this.currentSearchQuery = (query == null || query.trim().isEmpty()) ? null : query.trim();
-        notifyObservers(); // 通知 View 刷新
+        notifyObservers();
     }
 }
