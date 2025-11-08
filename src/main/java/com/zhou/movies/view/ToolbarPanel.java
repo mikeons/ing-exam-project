@@ -33,10 +33,10 @@ public class ToolbarPanel extends JToolBar {
         // ---------------------------------
         // Group 0: UNDO/REDO
         // ---------------------------------
-        undoButton = new JButton("Undo ↩\uFE0F");
+        undoButton = new JButton("Undo ↩️");
         add(undoButton);
 
-        redoButton = new JButton("Redo ↪\uFE0F");
+        redoButton = new JButton("Redo ↪️");
         add(redoButton);
 
         addSeparator();

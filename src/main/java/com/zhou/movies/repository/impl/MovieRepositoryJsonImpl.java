@@ -1,89 +1,70 @@
 package com.zhou.movies.repository.impl;
 
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.zhou.movies.pojo.Movie;
 import com.zhou.movies.repository.MovieRepository;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A Repository implementation that persists movie data to a JSON file.
- * This class handles all the logic for file I/O and JSON serialization/deserialization.
+ * JSON file-based repository for movies.
+ * Handles all file I/O and JSON (de)serialization using Gson.
  */
 public class MovieRepositoryJsonImpl implements MovieRepository {
 
-    private final String filePath;
+    private final Path filePath;
     private final Gson gson;
+    private static final Type MOVIE_LIST_TYPE = new TypeToken<List<Movie>>(){}.getType();
 
     public MovieRepositoryJsonImpl(String filePath) {
-        this.filePath = filePath;
-        // Use GsonBuilder to create a "pretty printing" Gson instance.
-        // This makes the resulting movies.json file human-readable.
+        this.filePath = Paths.get(filePath);
         this.gson = new GsonBuilder().setPrettyPrinting().create();
-
-        // Ensure the JSON file exists on startup.
         initFile();
     }
 
     /**
-     * Initializes the JSON file if it does not already exist.
-     * It writes an empty JSON array "[]" to the new file
-     * to prevent parse errors when "findAll" is called on an empty file.
+     * Ensure the JSON file exists with an empty array if newly created.
      */
     private void initFile() {
-        File file = new File(filePath);
-        if (!file.exists()) {
-            try {
-                file.createNewFile();
-                try (FileWriter writer = new FileWriter(file)) {
-                    writer.write("[]");
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
+        try {
+            // Ensure parent folder exists
+            if (filePath.getParent() != null) {
+                Files.createDirectories(filePath.getParent());
             }
+            // Create file with empty JSON array if it doesn't exist
+            if (Files.notExists(filePath)) {
+                Files.writeString(filePath, "[]", StandardCharsets.UTF_8);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to initialize JSON file: " + filePath, e);
         }
     }
 
     @Override
     public List<Movie> findAll() {
-        try (FileReader reader = new FileReader(filePath)) {
-
-            // This is the crucial part for deserializing generic types like List<T>.
-            // We must provide Gson with the *exact* type (List<Movie>)
-            // using a TypeToken, otherwise Gson only knows how to make a List of unknown objects.
-            Type listType = new TypeToken<List<Movie>>(){}.getType();
-
-            List<Movie> movies = gson.fromJson(reader, listType);
-
-            // If the file is empty or corrupted, gson.fromJson might return null.
-            // We must handle this case to avoid NullPointerExceptions.
-            if (movies == null) {
-                return new ArrayList<>();
-            }
-
-            return movies;
-
+        try {
+            String json = Files.readString(filePath, StandardCharsets.UTF_8);
+            List<Movie> movies = gson.fromJson(json, MOVIE_LIST_TYPE);
+            return movies != null ? movies : new ArrayList<>();
         } catch (IOException e) {
-            e.printStackTrace();
-            return new ArrayList<>();
+            throw new RuntimeException("Failed to read movie data from JSON file: " + filePath, e);
         }
     }
 
     @Override
     public void saveAll(List<Movie> moviesListCache) {
-        try (FileWriter writer = new FileWriter(filePath)) {
-            gson.toJson(moviesListCache, writer);
+        try {
+            String json = gson.toJson(moviesListCache);
+            Files.writeString(filePath, json, StandardCharsets.UTF_8);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Failed to save movie data to JSON file: " + filePath, e);
         }
     }
 }

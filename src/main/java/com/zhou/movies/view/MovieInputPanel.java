@@ -52,9 +52,7 @@ public class MovieInputPanel extends JPanel {
         add(cancelButton);
 
         // Pressing ENTER triggers the submit button, allowing quick keyboard submission
-        ActionListener submitOnEnter = e -> {
-            submitButton.doClick();
-        };
+        ActionListener submitOnEnter = e -> submitButton.doClick();
 
         titleField.addActionListener(submitOnEnter);
         directorField.addActionListener(submitOnEnter);
