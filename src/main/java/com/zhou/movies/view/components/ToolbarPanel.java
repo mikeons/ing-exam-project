@@ -1,4 +1,4 @@
-package com.zhou.movies.view;
+package com.zhou.movies.view.components;
 
 import com.zhou.movies.pojo.Category;
 import com.zhou.movies.pojo.Status;

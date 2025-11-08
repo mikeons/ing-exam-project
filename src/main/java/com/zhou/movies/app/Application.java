@@ -1,4 +1,4 @@
-package com.zhou.movies;
+package com.zhou.movies.app;
 
 import com.zhou.movies.command.CommandManager;
 import com.zhou.movies.controller.MovieController;
@@ -6,6 +6,7 @@ import com.zhou.movies.repository.MovieRepository;
 import com.zhou.movies.repository.impl.MovieRepositoryJsonImpl;
 import com.zhou.movies.service.impl.MovieServiceImpl;
 import com.zhou.movies.view.MovieView;
+import com.zhou.movies.view.event.ViewListenerManager;
 
 import javax.swing.*;
 
@@ -17,26 +18,29 @@ import javax.swing.*;
 public class Application {
     private final String JSON_FILE_PATH = "movies.json";
 
-    public void start(){
+    public void start() {
         SwingUtilities.invokeLater(() -> {
-            // 1. Create all concrete components
+            // Create components
             MovieRepository movieRepository = new MovieRepositoryJsonImpl(JSON_FILE_PATH);
             MovieServiceImpl serviceImpl = new MovieServiceImpl(movieRepository);
             MovieView view = new MovieView();
-
             CommandManager commandManager = new CommandManager();
             MovieController controller = new MovieController(serviceImpl, commandManager);
 
-            // 2. Wire dependencies
+            // Wire dependencies
             view.setController(controller);
 
-            // 3. Set up observer pattern
+            // Register view as observer
             serviceImpl.addObserver(view);
 
-            // 4. Load initial data
+            // Bind all UI listeners
+            ViewListenerManager listenerManager = new ViewListenerManager(view, controller);
+            listenerManager.bindListeners();
+
+            // Load initial data into table
             view.refreshTable(controller.getAllMovies());
 
-            // 5. Launch UI
+            // Launch UI
             view.setVisible(true);
         });
     }

@@ -2,7 +2,7 @@ package com.zhou.movies.view.state.impl;
 
 import com.zhou.movies.dto.MovieDTO;
 import com.zhou.movies.pojo.Movie;
-import com.zhou.movies.view.MovieInputPanel;
+import com.zhou.movies.view.components.MovieInputPanel;
 import com.zhou.movies.view.MovieView;
 import com.zhou.movies.view.state.FormState;
 

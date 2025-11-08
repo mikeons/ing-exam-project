@@ -1,4 +1,4 @@
-package com.zhou.movies.view;
+package com.zhou.movies.view.components;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
