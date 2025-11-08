@@ -234,15 +234,6 @@
     "status": "WANT_TO_WATCH"
   },
   {
-    "id": "b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6f",
-    "title": "Digital Nightmare",
-    "director": "Henry Wallace",
-    "year": 2022,
-    "rating": 3,
-    "category": "HORROR",
-    "status": "WATCHED"
-  },
-  {
     "id": "c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e7g",
     "title": "City of",
     "director": "Olivia Chen",
@@ -333,15 +324,6 @@
     "status": "WANT_TO_WATCH"
   },
   {
-    "id": "c5d6e7f8-a9b0-4c1d-2e3f-4a5b6c7d8e9g",
-    "title": "Crystal Warriors",
-    "director": "Martin Lee",
-    "year": 2021,
-    "rating": 4,
-    "category": "OTHER",
-    "status": "WATCHING"
-  },
-  {
     "id": "d6e7f8a9-b0c1-4d2e-3f4a-5b6c7d8e9f0b",
     "title": "Galactic Frontier",
     "director": "Rebecca Allen",
@@ -378,37 +360,10 @@
     "status": "WATCHING"
   },
   {
-    "id": "b0c1d2e3-f4a5-4b6c-7d8e-9f0a1b2c3d4f",
-    "title": "Eternal Journey",
-    "director": "Catherine Baker",
-    "year": 1978,
-    "rating": 5,
-    "category": "DRAMA",
-    "status": "WATCHED"
-  },
-  {
-    "id": "a61ebef9-bd3f-4ea4-9479-f691a9092506",
-    "title": "asdf",
-    "director": "asdf",
-    "year": 132,
-    "rating": 1,
-    "category": "ACTION",
-    "status": "WANT_TO_WATCH"
-  },
-  {
     "id": "670d4c8a-3732-46f0-88ed-11689f7559c5",
     "title": "Timeless ",
     "director": "asdf",
     "year": 133,
-    "rating": 1,
-    "category": "ACTION",
-    "status": "WANT_TO_WATCH"
-  },
-  {
-    "id": "ccbcd94e-4426-409d-b75e-b099ae398de8",
-    "title": "afsdf",
-    "director": "asdf",
-    "year": 123,
     "rating": 1,
     "category": "ACTION",
     "status": "WANT_TO_WATCH"
@@ -428,6 +383,33 @@
     "director": "Amanda White",
     "year": 2001,
     "rating": 5,
+    "category": "OTHER",
+    "status": "WATCHING"
+  },
+  {
+    "id": "b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6f",
+    "title": "Digital Nightmare",
+    "director": "Henry Wallace",
+    "year": 2022,
+    "rating": 3,
+    "category": "HORROR",
+    "status": "WATCHED"
+  },
+  {
+    "id": "b0c1d2e3-f4a5-4b6c-7d8e-9f0a1b2c3d4f",
+    "title": "Eternal Journey",
+    "director": "Catherine Baker",
+    "year": 1978,
+    "rating": 5,
+    "category": "DRAMA",
+    "status": "WATCHED"
+  },
+  {
+    "id": "c5d6e7f8-a9b0-4c1d-2e3f-4a5b6c7d8e9g",
+    "title": "Crystal Warriors",
+    "director": "Martin Lee",
+    "year": 2021,
+    "rating": 4,
     "category": "OTHER",
     "status": "WATCHING"
   }

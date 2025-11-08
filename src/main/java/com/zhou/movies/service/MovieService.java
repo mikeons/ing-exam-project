@@ -28,5 +28,5 @@ public interface MovieService {
 
     void setSearchQuery(String query);
 
-    void addMovieObject(Movie movieToDelete);
+    void addMovieObject(Movie movie);
 }

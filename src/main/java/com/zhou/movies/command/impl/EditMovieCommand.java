@@ -1,6 +1,7 @@
 package com.zhou.movies.command.impl;
 
 import com.zhou.movies.command.Command;
+import com.zhou.movies.command.CommandVisitor;
 import com.zhou.movies.dto.MovieDTO;
 import com.zhou.movies.pojo.Movie;
 import com.zhou.movies.service.MovieService;
@@ -29,7 +30,16 @@ public class EditMovieCommand implements Command {
         movieService.updateMovie(this.originalMovie);
     }
 
+    @Override
+    public void accept(CommandVisitor visitor) {
+        visitor.visit(this);
+    }
+
     public Movie getUpdatedMovie() {
         return updatedMovie;
+    }
+
+    public Movie getOriginalMovie() {
+        return originalMovie;
     }
 }

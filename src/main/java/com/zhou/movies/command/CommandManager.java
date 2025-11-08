@@ -18,19 +18,25 @@ public class CommandManager {
         redoStack.clear();
     }
 
-    public void undo() throws Exception{
+    public Command undo() throws Exception{
         if (!undoStack.isEmpty()){
             Command commandToUndo = undoStack.pop();
             commandToUndo.undo();
             redoStack.push(commandToUndo);
+            return commandToUndo;
         }
+
+        return null;
     }
 
-    public void redo() throws Exception{
+    public Command redo() throws Exception{
         if (!redoStack.isEmpty()){
             Command commandToRedo = redoStack.pop();
             commandToRedo.execute();
             undoStack.push(commandToRedo);
+            return commandToRedo;
         }
+
+        return null;
     }
 }

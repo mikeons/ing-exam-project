@@ -97,11 +97,11 @@ public class MovieController {
         movieService.setSearchQuery(query);
     }
 
-    public void undoRequest() throws Exception{
-        commandManager.undo();
+    public Command undoRequest() throws Exception{
+        return commandManager.undo();
     }
 
-    public void redoRequest() throws Exception{
-        commandManager.redo();
+    public Command redoRequest() throws Exception{
+        return commandManager.redo();
     }
 }

@@ -1,5 +1,7 @@
 package com.zhou.movies.view;
 
+import com.zhou.movies.command.Command;
+import com.zhou.movies.command.CommandVisitor;
 import com.zhou.movies.controller.MovieController;
 import com.zhou.movies.dto.MovieDTO;
 import com.zhou.movies.pojo.Category;
@@ -11,6 +13,8 @@ import com.zhou.movies.service.strategy.SortStrategyType;
 import com.zhou.movies.view.state.FormState;
 import com.zhou.movies.view.state.impl.AddModeState;
 import com.zhou.movies.view.state.impl.EditModeState;
+import com.zhou.movies.view.visitor.RedoViewVisitor;
+import com.zhou.movies.view.visitor.UndoViewVisitor;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -97,56 +101,6 @@ public class MovieView extends JFrame implements Observer {
         initSearchListeners();
         initUndoRedoListeners();
     }
-
-    private void initUndoRedoListeners() {
-
-        // --- Undo Button Listener ---
-        toolbarPanel.getUndoButton().addActionListener(e -> {
-            if (controller != null) {
-                try {
-                    controller.undoRequest();
-                } catch (Exception ex) {
-                    System.out.println("Undo error: " + ex.getMessage());
-                    JOptionPane.showMessageDialog(this,
-                            "Undo operation failed: \n" + ex.getMessage(),
-                            "Undo Error",
-                            JOptionPane.ERROR_MESSAGE);
-                }
-            }
-        });
-
-        // --- Redo Button Listener ---
-        toolbarPanel.getRedoButton().addActionListener(e -> {
-            if (controller != null) {
-                try {
-                    controller.redoRequest();
-                } catch (Exception ex) {
-                    System.out.println("Redo error: " + ex.getMessage());
-                    JOptionPane.showMessageDialog(this,
-                            "Redo operation failed: \n" + ex.getMessage(),
-                            "Redo Error",
-                            JOptionPane.ERROR_MESSAGE);
-                }
-            }
-        });
-    }
-
-    private void initSearchListeners() {
-        // Search Action
-        Runnable searchAction = () -> {
-            if (controller != null) {
-                String query = toolbarPanel.getSearchQuery();
-                controller.searchMovies(query);
-            }
-        };
-
-        // Search with button
-        toolbarPanel.getSearchButton().addActionListener(e -> searchAction.run());
-
-        // Search with Enter
-        toolbarPanel.getSearchField().addActionListener(e -> searchAction.run());
-    }
-
     private void initFormListeners(){
         // --- Submit button listener ---
         inputPanel.getSubmitButton().addActionListener(e -> {
@@ -295,9 +249,56 @@ public class MovieView extends JFrame implements Observer {
         });
     }
 
-    private void enterEditMode(Movie movie) {
-        this.currentState = new EditModeState(movie);
-        this.currentState.enterState(this);
+    private void initSearchListeners() {
+        // Search Action
+        Runnable searchAction = () -> {
+            if (controller != null) {
+                String query = toolbarPanel.getSearchQuery();
+                controller.searchMovies(query);
+            }
+        };
+
+        // Search with button
+        toolbarPanel.getSearchButton().addActionListener(e -> searchAction.run());
+
+        // Search with Enter
+        toolbarPanel.getSearchField().addActionListener(e -> searchAction.run());
+    }
+
+    private void initUndoRedoListeners() {
+        // Instantiate visitors for undo and redo
+        final CommandVisitor undoVisitor = new UndoViewVisitor(this);
+        final CommandVisitor redoVisitor = new RedoViewVisitor(this);
+
+        // Undo button listener
+        toolbarPanel.getUndoButton().addActionListener(e -> {
+            if (controller != null) {
+                try {
+                    Command cmd = controller.undoRequest();
+                    if (cmd != null) {
+                        // Apply the undo visitor to update the view
+                        cmd.accept(undoVisitor);
+                    }
+                } catch (Exception ex) {
+                    // Handle errors (e.g., show JOptionPane)
+                }
+            }
+        });
+
+        // Redo button listener
+        toolbarPanel.getRedoButton().addActionListener(e -> {
+            if (controller != null) {
+                try {
+                    Command cmd = controller.redoRequest();
+                    if (cmd != null) {
+                        // Apply the redo visitor to update the view
+                        cmd.accept(redoVisitor);
+                    }
+                } catch (Exception ex) {
+                    // Handle errors (e.g., show JOptionPane)
+                }
+            }
+        });
     }
 
     public void refreshTable(List<Movie> movies) {
@@ -333,6 +334,11 @@ public class MovieView extends JFrame implements Observer {
                 movieTable.scrollRectToVisible(movieTable.getCellRect(viewRowIndex, 0, true));
             }
         }
+    }
+
+    private void enterEditMode(Movie movie) {
+        this.currentState = new EditModeState(movie);
+        this.currentState.enterState(this);
     }
 
     public MovieInputPanel getInputPanel() {
