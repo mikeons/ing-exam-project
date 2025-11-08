@@ -36,7 +36,6 @@ public class MovieView extends JFrame implements Observer {
     private List<Movie> currentMoviesList;
 
     private FormState currentState;
-    private Movie movieToEdit = null;
 
     public MovieView() {
         setTitle("My movies collection");
@@ -85,18 +84,51 @@ public class MovieView extends JFrame implements Observer {
         add(toolbarPanel, BorderLayout.NORTH);
         add(new JScrollPane(movieTable), BorderLayout.CENTER);
         add(inputPanel, BorderLayout.SOUTH);
+        add(actionPanel, BorderLayout.EAST);
 
-        add(actionPanel, BorderLayout.EAST); // 添加到布局的东侧
         // --- Linking Listeners to buttons ---
         initListeners();
     }
-
 
     private void initListeners(){
         initFormListeners();
         initEditDeleteListeners();
         initSortAndFilterListeners();
         initSearchListeners();
+        initUndoRedoListeners();
+    }
+
+    private void initUndoRedoListeners() {
+
+        // --- Undo Button Listener ---
+        toolbarPanel.getUndoButton().addActionListener(e -> {
+            if (controller != null) {
+                try {
+                    controller.undoRequest();
+                } catch (Exception ex) {
+                    System.out.println("Undo error: " + ex.getMessage());
+                    JOptionPane.showMessageDialog(this,
+                            "Undo operation failed: \n" + ex.getMessage(),
+                            "Undo Error",
+                            JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+
+        // --- Redo Button Listener ---
+        toolbarPanel.getRedoButton().addActionListener(e -> {
+            if (controller != null) {
+                try {
+                    controller.redoRequest();
+                } catch (Exception ex) {
+                    System.out.println("Redo error: " + ex.getMessage());
+                    JOptionPane.showMessageDialog(this,
+                            "Redo operation failed: \n" + ex.getMessage(),
+                            "Redo Error",
+                            JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
     }
 
     private void initSearchListeners() {
@@ -145,7 +177,7 @@ public class MovieView extends JFrame implements Observer {
     }
 
     private void initEditDeleteListeners() {
-        // --- Edit Button Listener ---
+        // --- Edit Mode with Button Listener ---
         actionPanel.getEditButton().addActionListener(e -> {
             int viewRow = movieTable.getSelectedRow();
             if (viewRow == -1) {
@@ -153,10 +185,25 @@ public class MovieView extends JFrame implements Observer {
                 return;
             }
             int modelRow = movieTable.convertRowIndexToModel(viewRow);
-            this.movieToEdit = this.currentMoviesList.get(modelRow);
+            Movie movieToEdit = this.currentMoviesList.get(modelRow);
 
-            this.currentState = new EditModeState(this.movieToEdit);
-            this.currentState.enterState(this);
+            enterEditMode(movieToEdit);
+        });
+
+        // --- Edit Mode with double clicks Listener ---
+        movieTable.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    int viewRow = movieTable.rowAtPoint(e.getPoint());
+                    if (viewRow >= 0) {
+                        int modelRow = movieTable.convertRowIndexToModel(viewRow);
+                        Movie movieToEdit = currentMoviesList.get(modelRow);
+
+                        enterEditMode(movieToEdit);
+                    }
+                }
+            }
         });
 
         // --- Delete Button Listener ---
@@ -173,10 +220,19 @@ public class MovieView extends JFrame implements Observer {
             if (choice != JOptionPane.YES_OPTION) {
                 return;
             }
+
             int modelRow = movieTable.convertRowIndexToModel(viewRow);
             Movie movieToDelete = this.currentMoviesList.get(modelRow);
-            controller.deleteMovie(movieToDelete.getId());
-        });
+
+            try {
+                controller.deleteMovieRequest(movieToDelete);
+            } catch (Exception ex) {
+                System.out.println("Delete error: " + ex.getMessage());
+                JOptionPane.showMessageDialog(this,
+                        "Delete operation failed: \n" + ex.getMessage(),
+                        "Delete Error",
+                        JOptionPane.ERROR_MESSAGE);
+            }        });
     }
 
     private void initSortAndFilterListeners() {
@@ -239,6 +295,11 @@ public class MovieView extends JFrame implements Observer {
         });
     }
 
+    private void enterEditMode(Movie movie) {
+        this.currentState = new EditModeState(movie);
+        this.currentState.enterState(this);
+    }
+
     public void refreshTable(List<Movie> movies) {
         tableModel.setRowCount(0);
 
@@ -276,10 +337,6 @@ public class MovieView extends JFrame implements Observer {
 
     public MovieInputPanel getInputPanel() {
         return this.inputPanel;
-    }
-
-    public void setMovieToEdit(Movie movie) {
-        this.movieToEdit = movie;
     }
 
     @Override

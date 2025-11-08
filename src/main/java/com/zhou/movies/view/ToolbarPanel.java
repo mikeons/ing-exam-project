@@ -25,7 +25,21 @@ public class ToolbarPanel extends JToolBar {
     private final JTextField searchField;
     private final JButton searchButton;
 
+    private final JButton undoButton;
+    private final JButton redoButton;
+
     public ToolbarPanel() {
+
+        // ---------------------------------
+        // Group 0: UNDO/REDO
+        // ---------------------------------
+        undoButton = new JButton("Undo ↩\uFE0F");
+        add(undoButton);
+
+        redoButton = new JButton("Redo ↪\uFE0F");
+        add(redoButton);
+
+        addSeparator();
 
         // ---------------------------------
         // Group 1: SORTING
@@ -139,6 +153,14 @@ public class ToolbarPanel extends JToolBar {
 
     public String getSearchQuery() {
         return searchField.getText();
+    }
+
+    public JButton getUndoButton() {
+        return undoButton;
+    }
+
+    public JButton getRedoButton() {
+        return redoButton;
     }
 
     public void resetFilterControls() {

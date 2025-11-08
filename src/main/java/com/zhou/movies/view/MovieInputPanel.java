@@ -7,6 +7,7 @@ import com.zhou.movies.pojo.Status;
 import com.zhou.movies.pojo.Movie;
 
 import java.awt.*;
+import java.awt.event.ActionListener;
 
 /**
  * A dedicated panel for "Add Movie" inputs.
@@ -49,6 +50,15 @@ public class MovieInputPanel extends JPanel {
         // Initialize form buttons
         add(submitButton);
         add(cancelButton);
+
+        // Pressing ENTER triggers the submit button, allowing quick keyboard submission
+        ActionListener submitOnEnter = e -> {
+            submitButton.doClick();
+        };
+
+        titleField.addActionListener(submitOnEnter);
+        directorField.addActionListener(submitOnEnter);
+        yearField.addActionListener(submitOnEnter);
     }
 
     public String getTitleText() { return titleField.getText(); }

@@ -1,5 +1,6 @@
 package com.zhou.movies;
 
+import com.zhou.movies.command.CommandManager;
 import com.zhou.movies.controller.MovieController;
 import com.zhou.movies.repository.MovieRepository;
 import com.zhou.movies.repository.impl.MovieRepositoryJsonImpl;
@@ -22,7 +23,9 @@ public class Application {
             MovieRepository movieRepository = new MovieRepositoryJsonImpl(JSON_FILE_PATH);
             MovieServiceImpl serviceImpl = new MovieServiceImpl(movieRepository);
             MovieView view = new MovieView();
-            MovieController controller = new MovieController(serviceImpl);
+
+            CommandManager commandManager = new CommandManager();
+            MovieController controller = new MovieController(serviceImpl, commandManager);
 
             // 2. Wire dependencies
             view.setController(controller);

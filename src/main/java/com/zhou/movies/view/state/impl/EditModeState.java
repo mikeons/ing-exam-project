@@ -18,11 +18,10 @@ public class EditModeState implements FormState {
 
     @Override
     public FormState handleSubmit(MovieView context, MovieDTO dto) {
-        String idToSelect = movieToEdit.getId();
-        boolean success = context.getController().editMovieRequest(idToSelect, dto);
+        Movie updatedMovie = context.getController().editMovieRequest(this.movieToEdit, dto);
 
-        if (success) {
-            context.selectRowById(idToSelect);
+        if (updatedMovie != null) {
+            context.selectRowById(updatedMovie.getId());
             return new AddModeState();
         } else {
             JOptionPane.showMessageDialog(context, "Update Failed...", "Error", JOptionPane.ERROR_MESSAGE);

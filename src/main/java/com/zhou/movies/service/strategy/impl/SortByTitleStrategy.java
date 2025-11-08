@@ -10,7 +10,7 @@ import java.util.List;
 public class SortByTitleStrategy implements SortingStrategy {
     @Override
     public void sort(List<Movie> movies, SortDirection direction) {
-        Comparator<Movie> comparator = Comparator.comparing(Movie::getTitle);
+        Comparator<Movie> comparator = Comparator.comparing(Movie::getTitle, String.CASE_INSENSITIVE_ORDER);
 
         if (direction == SortDirection.DESCENDING)
             comparator = comparator.reversed();

@@ -1,5 +1,8 @@
 package com.zhou.movies.controller;
 
+import com.zhou.movies.command.CommandManager;
+import com.zhou.movies.command.impl.*;
+import com.zhou.movies.command.Command;
 import com.zhou.movies.dto.MovieDTO;
 import com.zhou.movies.pojo.Category;
 import com.zhou.movies.pojo.Movie;
@@ -7,39 +10,50 @@ import com.zhou.movies.pojo.Status;
 import com.zhou.movies.service.MovieService;
 import com.zhou.movies.service.strategy.SortDirection;
 import com.zhou.movies.service.strategy.SortStrategyType;
-
 import java.util.List;
 
 public class MovieController {
 
     private final MovieService movieService;
+    private final CommandManager commandManager;
 
-    public MovieController(MovieService movieService) {
+    public MovieController(MovieService movieService, CommandManager commandManager) {
         this.movieService = movieService;
+        this.commandManager = commandManager;
     }
 
-    public boolean addMovieRequest(MovieDTO dto) {
+    public Movie addMovieRequest(MovieDTO dto) {
         try {
             validateFields(dto);
-            movieService.addMovie(dto);
-            return true;
+
+            AddMovieCommand addCmd = new AddMovieCommand(movieService, dto);
+            commandManager.execute(addCmd);
+
+            return addCmd.getCreatedMovie();
         } catch (Exception e) {
             System.out.println("Add Movie Failed: " + e.getMessage());
-            return false;
+            return null;
         }
     }
 
-    public boolean editMovieRequest(String id, MovieDTO dto) {
+    public Movie editMovieRequest(Movie movieToEdit, MovieDTO dto) {
         try {
             validateFields(dto);
-            movieService.editMovie(id, dto);
-            return true;
+
+            EditMovieCommand editCmd = new EditMovieCommand(movieService, movieToEdit, dto);
+            commandManager.execute(editCmd);
+
+            return editCmd.getUpdatedMovie();
         } catch (Exception e) {
             System.out.println("Update Failed: " + e.getMessage());
-            return false;
+            return null;
         }
     }
 
+    public void deleteMovieRequest(Movie movieToDelete) throws Exception {
+        Command deleteCmd = new DeleteMovieCommand(movieService, movieToDelete);
+        commandManager.execute(deleteCmd);
+    }
     private void validateFields(MovieDTO dto) throws Exception {
         if (dto.title.isEmpty() || dto.director.isEmpty() || dto.yearStr.isEmpty())
             throw new Exception("Title, Director or Year cannot be empty!");
@@ -53,10 +67,6 @@ public class MovieController {
 
     public List<Movie> getAllMovies(){
         return movieService.getAllMovies();
-    }
-
-    public void deleteMovie(String id) {
-        movieService.deleteMovie(id);
     }
 
     public void changeSortStrategy(SortStrategyType strategyType){
@@ -85,5 +95,13 @@ public class MovieController {
 
     public void searchMovies(String query) {
         movieService.setSearchQuery(query);
+    }
+
+    public void undoRequest() throws Exception{
+        commandManager.undo();
+    }
+
+    public void redoRequest() throws Exception{
+        commandManager.redo();
     }
 }
