@@ -1,7 +1,8 @@
 package com.zhou.movies.view.state.impl;
 
 import com.zhou.movies.dto.MovieDTO;
-import com.zhou.movies.view.MovieInputPanel;
+import com.zhou.movies.pojo.Movie;
+import com.zhou.movies.view.components.MovieInputPanel;
 import com.zhou.movies.view.MovieView;
 import com.zhou.movies.view.state.FormState;
 
@@ -11,11 +12,15 @@ public class AddModeState implements FormState {
 
     @Override
     public FormState handleSubmit(MovieView context, MovieDTO dto) {
-        boolean success = context.getController().addMovieRequest(dto);
-        if (success) {
+        Movie createdMovie = context.getController().addMovieRequest(dto);
+
+        if (createdMovie != null) {
             context.getInputPanel().clearFields();
+            context.selectRowById(createdMovie.getId());
         } else {
-            JOptionPane.showMessageDialog(context, "Insertion Failed...", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(context,
+                    "Insertion Failed: Please check input data.",
+                    "Error", JOptionPane.ERROR_MESSAGE);
         }
         return this;
     }
@@ -26,7 +31,5 @@ public class AddModeState implements FormState {
         panel.clearFields();
         panel.getSubmitButton().setText("ADD");
         panel.getCancelButton().setVisible(false);
-
-        context.setMovieToEdit(null);
     }
 }

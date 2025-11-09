@@ -2,7 +2,7 @@ package com.zhou.movies.view.state.impl;
 
 import com.zhou.movies.dto.MovieDTO;
 import com.zhou.movies.pojo.Movie;
-import com.zhou.movies.view.MovieInputPanel;
+import com.zhou.movies.view.components.MovieInputPanel;
 import com.zhou.movies.view.MovieView;
 import com.zhou.movies.view.state.FormState;
 
@@ -18,11 +18,10 @@ public class EditModeState implements FormState {
 
     @Override
     public FormState handleSubmit(MovieView context, MovieDTO dto) {
-        String idToSelect = movieToEdit.getId();
-        boolean success = context.getController().editMovieRequest(idToSelect, dto);
+        Movie updatedMovie = context.getController().editMovieRequest(this.movieToEdit, dto);
 
-        if (success) {
-            context.selectRowById(idToSelect);
+        if (updatedMovie != null) {
+            context.selectRowById(updatedMovie.getId());
             return new AddModeState();
         } else {
             JOptionPane.showMessageDialog(context, "Update Failed...", "Error", JOptionPane.ERROR_MESSAGE);

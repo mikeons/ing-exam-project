@@ -11,9 +11,11 @@ import java.util.List;
 
 public interface MovieService {
     List<Movie> getAllMovies();
-    void addMovie(MovieDTO dto) throws Exception;
-    void editMovie(String id, MovieDTO dto) throws Exception;
+
+    Movie addMovie(MovieDTO dto) throws Exception;
+    Movie editMovie(String id, MovieDTO dto) throws Exception;
     void deleteMovie(String id);
+    void updateMovie(Movie movie);
 
     void setSortStrategy(SortStrategyType strategyType);
     void setSortDirection(SortDirection sortDirection);
@@ -25,4 +27,6 @@ public interface MovieService {
     void resetFiltersAndSort();
 
     void setSearchQuery(String query);
+
+    void addMovieObject(Movie movie);
 }

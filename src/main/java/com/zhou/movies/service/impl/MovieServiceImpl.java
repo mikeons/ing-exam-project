@@ -19,6 +19,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Core service handling all movie-related business logic.
+ *
+ * Responsibility:
+ * Performs CRUD operations, filtering, sorting, and search on movies,
+ * maintains a cached movie list, and notifies observers of data changes.
+ * Applies Strategy pattern for sorting and Observer pattern for UI updates.
+ */
 public class MovieServiceImpl implements MovieService, Subject {
     private final MovieRepository movieRepository;
     private final List<Observer> observers;
@@ -75,19 +83,14 @@ public class MovieServiceImpl implements MovieService, Subject {
     }
 
     @Override
-    public void deleteMovie(String id) {
-        // Remove the movie from cache using its unique ID
-        moviesListCache.removeIf(movie -> movie.getId().equals(id));
-
-        // Update the JSON file (by overwriting with the new cache)
+    public void addMovieObject(Movie movie) {
+        moviesListCache.add(movie);
         movieRepository.saveAll(moviesListCache);
-
-        // Notify all observers (View) to refresh
         notifyObservers();
     }
 
     @Override
-    public void addMovie(MovieDTO dto) throws Exception {
+    public Movie addMovie(MovieDTO dto) throws Exception {
         int year = Integer.parseInt(dto.yearStr);
 
         // Build a new domain object (Movie)
@@ -104,10 +107,12 @@ public class MovieServiceImpl implements MovieService, Subject {
 
         // Notify observers to refresh the view
         notifyObservers();
+
+        return movie;
     }
 
     @Override
-    public void editMovie(String id, MovieDTO dto) throws Exception {
+    public Movie editMovie(String id, MovieDTO dto) throws Exception {
         // Find the original movie by ID or throw if not found
         Movie originalMovie = moviesListCache.stream()
                 .filter(m -> m.getId().equals(id))
@@ -126,10 +131,30 @@ public class MovieServiceImpl implements MovieService, Subject {
                 .rating(dto.rating)
                 .build();
 
-        // Replace in cache, persist, and notify observers
-        int index = moviesListCache.indexOf(originalMovie);
-        moviesListCache.set(index, updatedMovie);
+        updateMovie(updatedMovie);
+        return updatedMovie;
+    }
+
+    @Override
+    public void updateMovie(Movie movie) {
+        int index = moviesListCache.indexOf(movie);
+
+        if (index != -1) {
+            moviesListCache.set(index, movie);
+            movieRepository.saveAll(moviesListCache);
+            notifyObservers();
+        }
+    }
+
+    @Override
+    public void deleteMovie(String id) {
+        // Remove the movie from cache using its unique ID
+        moviesListCache.removeIf(movie -> movie.getId().equals(id));
+
+        // Update the JSON file (by overwriting with the new cache)
         movieRepository.saveAll(moviesListCache);
+
+        // Notify all observers (View) to refresh
         notifyObservers();
     }
 
