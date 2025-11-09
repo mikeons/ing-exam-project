@@ -12,6 +12,14 @@ import com.zhou.movies.service.strategy.SortDirection;
 import com.zhou.movies.service.strategy.SortStrategyType;
 import java.util.List;
 
+/**
+ * Mediator between the UI and the service layer.
+ *
+ * Responsibility:
+ * Processes user actions related to movies (add, edit, delete, sort, filter, search),
+ * handles validation, and coordinates undo/redo operations via the Command pattern.
+ */
+
 public class MovieController {
 
     private final MovieService movieService;

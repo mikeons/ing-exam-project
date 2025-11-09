@@ -1,4 +1,4 @@
-package com.zhou.movies.app;
+package com.zhou.movies;
 
 public class Main {
     public static void main(String[] args) {

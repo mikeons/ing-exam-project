@@ -19,6 +19,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Core service handling all movie-related business logic.
+ *
+ * Responsibility:
+ * Performs CRUD operations, filtering, sorting, and search on movies,
+ * maintains a cached movie list, and notifies observers of data changes.
+ * Applies Strategy pattern for sorting and Observer pattern for UI updates.
+ */
 public class MovieServiceImpl implements MovieService, Subject {
     private final MovieRepository movieRepository;
     private final List<Observer> observers;

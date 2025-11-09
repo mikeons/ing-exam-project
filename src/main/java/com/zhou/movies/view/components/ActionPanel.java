@@ -6,8 +6,10 @@ import javax.swing.border.TitledBorder;
 import java.awt.*;
 
 /**
- * A dedicated panel for contextual actions like Edit and Delete.
- * Demonstrates UI-level Separation of Concerns (SoC).
+ * Panel containing contextual action buttons such as Edit and Delete.
+ *
+ * Responsibility:
+ * Provides a clear, isolated section for user actions related to movie management.
  */
 public class ActionPanel extends JPanel {
 
@@ -15,7 +17,7 @@ public class ActionPanel extends JPanel {
     private final JButton deleteButton;
 
     public ActionPanel() {
-        // Create a titled border with padding
+        // Set titled border with padding
         setBorder(BorderFactory.createTitledBorder(
                 new EmptyBorder(10, 10, 10, 10),
                 "Actions",
@@ -30,7 +32,7 @@ public class ActionPanel extends JPanel {
         editButton = new JButton("Edit Movie ✍️");
         deleteButton = new JButton("Delete Movie 🗑️");
 
-        // Set consistent button size
+        // Ensure consistent button sizing
         Dimension buttonSize = new Dimension(150, 30);
         editButton.setPreferredSize(buttonSize);
         deleteButton.setPreferredSize(buttonSize);
@@ -41,17 +43,10 @@ public class ActionPanel extends JPanel {
         add(editButton);
         add(Box.createRigidArea(new Dimension(0, 10)));
         add(deleteButton);
-
-        // Prevent vertical stretching
-        add(Box.createVerticalGlue());
+        add(Box.createVerticalGlue()); // Prevent vertical stretching
     }
 
     // --- Getters ---
-    public JButton getEditButton() {
-        return editButton;
-    }
-
-    public JButton getDeleteButton() {
-        return deleteButton;
-    }
+    public JButton getEditButton() { return editButton; }
+    public JButton getDeleteButton() { return deleteButton; }
 }

@@ -7,6 +7,7 @@ import com.zhou.movies.view.components.ActionPanel;
 import com.zhou.movies.view.components.MovieInputPanel;
 import com.zhou.movies.view.components.ToolbarPanel;
 import com.zhou.movies.view.state.FormState;
+import com.zhou.movies.view.state.impl.AddModeState;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -15,10 +16,11 @@ import java.awt.*;
 import java.util.List;
 
 /**
- * MovieView acts as a "dumb container" following SRP:
- * 1. Holds and arranges all UI components.
- * 2. Observes MovieService to refresh the table.
- * 3. Provides public getters/setters for external access (Manager, State, Visitor).
+ * Main container for the movie management UI.
+ *
+ * Responsibility:
+ * Holds and arranges all UI components, observes movie data changes,
+ * and provides access to components and state for controllers or visitors.
  */
 public class MovieView extends JFrame implements Observer {
 
@@ -36,6 +38,8 @@ public class MovieView extends JFrame implements Observer {
         setSize(1300, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
+
+        currentState = new AddModeState();
         initComponents();
     }
 
@@ -50,6 +54,8 @@ public class MovieView extends JFrame implements Observer {
         movieTable = new JTable(tableModel);
         movieTable.getTableHeader().setReorderingAllowed(false);
 
+        setPreferredWidth();
+
         // Sub-panels
         inputPanel = new MovieInputPanel();
         toolbarPanel = new ToolbarPanel();
@@ -62,6 +68,15 @@ public class MovieView extends JFrame implements Observer {
         add(new JScrollPane(movieTable), BorderLayout.CENTER);
         add(inputPanel, BorderLayout.SOUTH);
         add(actionPanel, BorderLayout.EAST);
+    }
+
+    private void setPreferredWidth(){
+        movieTable.getColumnModel().getColumn(0).setPreferredWidth(250); // Title
+        movieTable.getColumnModel().getColumn(1).setPreferredWidth(200); // Director
+        movieTable.getColumnModel().getColumn(2).setPreferredWidth(70);  // Year
+        movieTable.getColumnModel().getColumn(3).setPreferredWidth(120); // Category
+        movieTable.getColumnModel().getColumn(4).setPreferredWidth(120); // Status
+        movieTable.getColumnModel().getColumn(5).setPreferredWidth(50);  // Rating
     }
 
     /** Observer update: refresh table with current movie list. */

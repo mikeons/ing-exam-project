@@ -1,4 +1,4 @@
-package com.zhou.movies.app;
+package com.zhou.movies;
 
 import com.zhou.movies.command.CommandManager;
 import com.zhou.movies.controller.MovieController;
